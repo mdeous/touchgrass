@@ -34,6 +34,7 @@ export function AppShell() {
   const preBookedTypes = useAppStore((s) => s.preBookedTypes);
   const customHolidays = useAppStore((s) => s.customHolidays);
   const manualOverrides = useAppStore((s) => s.manualOverrides);
+  const disabledBridges = useAppStore((s) => s.disabledBridges);
 
   const config: AppConfig = {
     year,
@@ -47,11 +48,12 @@ export function AppShell() {
     preBookedTypes,
     customHolidays,
     manualOverrides,
+    disabledBridges,
   };
 
   useUrlState();
 
-  const { calendar, result } = useOptimization(config);
+  const { calendar, result, allBridges } = useOptimization(config);
 
   const cpRemaining = config.cpBudget - result.cpUsed;
   const rttRemaining = config.rttBudget - result.rttUsed;
@@ -103,7 +105,11 @@ export function AppShell() {
 
         {/* Right sidebar — scrolls independently */}
         <aside className="w-full shrink-0 overflow-y-auto xl:w-[320px]">
-          <ResultsPanel result={result} config={config} />
+          <ResultsPanel
+            result={result}
+            config={config}
+            allBridges={allBridges}
+          />
         </aside>
       </main>
 

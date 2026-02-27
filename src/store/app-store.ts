@@ -1,22 +1,29 @@
-import { create } from 'zustand'
-import type { AppConfig, LeaveType, Region, SchoolZone, Strategy } from '@/engine/types'
-import { DEFAULT_CONFIG } from '@/engine/types'
+import { create } from "zustand";
+import type {
+  AppConfig,
+  LeaveType,
+  Region,
+  SchoolZone,
+  Strategy,
+} from "@/engine/types";
+import { DEFAULT_CONFIG } from "@/engine/types";
 
 interface AppState extends AppConfig {
-  setYear: (year: number) => void
-  setRegion: (region: Region) => void
-  setSchoolZone: (zone: SchoolZone) => void
-  setCpBudget: (budget: number) => void
-  setRttBudget: (budget: number) => void
-  setStrategy: (strategy: Strategy) => void
-  addBlackoutDate: (dateKey: string) => void
-  removeBlackoutDate: (dateKey: string) => void
-  addPreBookedDate: (dateKey: string, leaveType: LeaveType) => void
-  removePreBookedDate: (dateKey: string) => void
-  addCustomHoliday: (dateKey: string) => void
-  removeCustomHoliday: (dateKey: string) => void
-  toggleManualOverride: (dateKey: string, leaveType: LeaveType | null) => void
-  resetConfig: () => void
+  setYear: (year: number) => void;
+  setRegion: (region: Region) => void;
+  setSchoolZone: (zone: SchoolZone) => void;
+  setCpBudget: (budget: number) => void;
+  setRttBudget: (budget: number) => void;
+  setStrategy: (strategy: Strategy) => void;
+  addBlackoutDate: (dateKey: string) => void;
+  removeBlackoutDate: (dateKey: string) => void;
+  addPreBookedDate: (dateKey: string, leaveType: LeaveType) => void;
+  removePreBookedDate: (dateKey: string) => void;
+  addCustomHoliday: (dateKey: string) => void;
+  removeCustomHoliday: (dateKey: string) => void;
+  toggleManualOverride: (dateKey: string, leaveType: LeaveType | null) => void;
+  toggleBridgeDisabled: (pontName: string) => void;
+  resetConfig: () => void;
 }
 
 export const useAppStore = create<AppState>()((set) => ({
@@ -56,11 +63,11 @@ export const useAppStore = create<AppState>()((set) => ({
 
   removePreBookedDate: (dateKey) =>
     set((state) => {
-      const { [dateKey]: _, ...remainingTypes } = state.preBookedTypes
+      const { [dateKey]: _, ...remainingTypes } = state.preBookedTypes;
       return {
         preBookedDates: state.preBookedDates.filter((d) => d !== dateKey),
         preBookedTypes: remainingTypes,
-      }
+      };
     }),
 
   addCustomHoliday: (dateKey) =>
@@ -78,17 +85,24 @@ export const useAppStore = create<AppState>()((set) => ({
   toggleManualOverride: (dateKey, leaveType) =>
     set((state) => {
       if (leaveType === null) {
-        const { [dateKey]: _, ...remaining } = state.manualOverrides
-        return { manualOverrides: remaining }
+        const { [dateKey]: _, ...remaining } = state.manualOverrides;
+        return { manualOverrides: remaining };
       }
       return {
         manualOverrides: { ...state.manualOverrides, [dateKey]: leaveType },
-      }
+      };
     }),
+
+  toggleBridgeDisabled: (pontName) =>
+    set((state) => ({
+      disabledBridges: state.disabledBridges.includes(pontName)
+        ? state.disabledBridges.filter((n) => n !== pontName)
+        : [...state.disabledBridges, pontName],
+    })),
 
   resetConfig: () =>
     set({
       ...DEFAULT_CONFIG,
       year: new Date().getFullYear(),
     }),
-}))
+}));

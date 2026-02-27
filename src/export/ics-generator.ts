@@ -12,7 +12,7 @@ function buildEvents(
   return result.selectedBridges.map((bridge) => {
     const start = toDateArray(bridge.startDate);
     const end = toDateArray(bridge.endDate);
-    const title = bridge.pontName ?? "PTO";
+    const title = bridge.pontName ? `Pont: ${bridge.pontName}` : "PTO";
     const durationDays = bridge.totalDaysOff;
 
     return {

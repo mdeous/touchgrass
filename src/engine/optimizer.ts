@@ -11,9 +11,11 @@ export function optimize(
   rttBudget: number,
   blackoutDates: readonly string[],
   preBookedDates: readonly string[],
+  disabledBridges: readonly string[] = [],
 ): Bridge[] {
   const blackoutSet = new Set(blackoutDates);
   const preBookedSet = new Set(preBookedDates);
+  const disabledSet = new Set(disabledBridges);
 
   const preBookedCost = preBookedDates.length;
 
@@ -25,6 +27,8 @@ export function optimize(
 
   for (const bridge of sorted) {
     if (remainingBudget <= 0) break;
+
+    if (bridge.pontName && disabledSet.has(bridge.pontName)) continue;
 
     const dateKeys = getBridgeDateKeys(bridge);
 

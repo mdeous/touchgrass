@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import type { Bridge, OptimizationResult } from "@/engine/types";
 
 function formatBridge(bridge: Bridge): string {
-  const name = bridge.pontName ?? "PTO Break";
+  const name = bridge.pontName ? `Pont: ${bridge.pontName}` : "PTO Break";
   const start = format(bridge.startDate, "MMM d");
   const end = format(bridge.endDate, "MMM d, yyyy");
   const eff = bridge.efficiency.toFixed(1);

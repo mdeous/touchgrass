@@ -27,7 +27,7 @@ function findAdjacentHolidays(
     const day = calendarMap.get(key);
     if (!day || (!day.isWeekend && day.type !== "holiday")) break;
     if (day.holiday) {
-      holidays.push(day.holiday.name);
+      holidays.push(day.holiday.nameEn);
     }
     checkBefore = addDays(checkBefore, -1);
   }
@@ -38,7 +38,7 @@ function findAdjacentHolidays(
     const day = calendarMap.get(key);
     if (!day || (!day.isWeekend && day.type !== "holiday")) break;
     if (day.holiday) {
-      holidays.push(day.holiday.name);
+      holidays.push(day.holiday.nameEn);
     }
     checkAfter = addDays(checkAfter, 1);
   }
@@ -96,23 +96,9 @@ function findClusterBounds(
   };
 }
 
-function buildPontName(adjacentHolidays: string[]): string | null {
-  if (adjacentHolidays.length === 0) return null;
-  const name = adjacentHolidays[adjacentHolidays.length - 1];
-  return `Pont ${getArticle(name)}${name}`;
-}
-
-function getArticle(holidayName: string): string {
-  const vowelStart = /^[AEIOUÉÈÊaeiouéèê]/;
-  if (
-    holidayName.startsWith("l'") ||
-    holidayName.startsWith("la ") ||
-    holidayName.startsWith("le ")
-  ) {
-    return `de ${holidayName.startsWith("l'") ? "" : "la "}`;
-  }
-  if (vowelStart.test(holidayName)) return "de l'";
-  return "du ";
+function buildPontName(adjacentHolidayNames: readonly string[]): string | null {
+  if (adjacentHolidayNames.length === 0) return null;
+  return adjacentHolidayNames[adjacentHolidayNames.length - 1];
 }
 
 export function findBridges(calendar: DayInfo[]): Bridge[] {

@@ -9,9 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
 import { ConfigPanel } from "@/components/config/ConfigPanel";
 import { CalendarGrid } from "@/components/calendar/CalendarGrid";
 import { CalendarLegend } from "@/components/calendar/CalendarLegend";
@@ -64,10 +62,11 @@ export function AppShell() {
   );
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col overflow-hidden">
       <Header />
 
-      <main className="mx-auto flex w-full max-w-screen-2xl flex-1 flex-col gap-4 p-4 xl:flex-row">
+      <main className="mx-auto flex w-full max-w-screen-2xl flex-1 flex-col gap-4 overflow-hidden p-4 xl:flex-row">
+        {/* Mobile config trigger */}
         <div className="xl:hidden">
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
@@ -76,26 +75,24 @@ export function AppShell() {
                 Configuration
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-80 p-0">
+            <SheetContent side="left" className="w-80 overflow-y-auto p-0">
               <SheetHeader className="px-4 pt-4">
                 <SheetTitle>Configuration</SheetTitle>
               </SheetHeader>
-              <ScrollArea className="h-[calc(100vh-5rem)] px-4 pb-4">
+              <div className="px-4 pb-4">
                 <ConfigPanel />
-              </ScrollArea>
+              </div>
             </SheetContent>
           </Sheet>
         </div>
 
-        <aside className="hidden w-[280px] shrink-0 xl:block">
-          <div className="sticky top-4">
-            <ScrollArea className="h-[calc(100vh-8rem)]">
-              <ConfigPanel />
-            </ScrollArea>
-          </div>
+        {/* Left sidebar — scrolls independently */}
+        <aside className="hidden w-[280px] shrink-0 overflow-y-auto xl:block">
+          <ConfigPanel />
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-4">
+        {/* Calendar — scrolls independently */}
+        <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto">
           <CalendarLegend />
           <CalendarGrid
             days={calendar}
@@ -104,12 +101,12 @@ export function AppShell() {
           />
         </div>
 
-        <aside className="w-full shrink-0 xl:w-[320px]">
+        {/* Right sidebar — scrolls independently */}
+        <aside className="w-full shrink-0 overflow-y-auto xl:w-[320px]">
           <ResultsPanel result={result} config={config} />
         </aside>
       </main>
 
-      <Footer />
       <Toaster position="bottom-right" />
     </div>
   );

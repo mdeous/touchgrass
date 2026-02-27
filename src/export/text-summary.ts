@@ -5,7 +5,9 @@ function formatBridge(bridge: Bridge): string {
   const name = bridge.pontName ? `Pont: ${bridge.pontName}` : "PTO Break";
   const start = format(bridge.startDate, "MMM d");
   const end = format(bridge.endDate, "MMM d, yyyy");
-  const eff = bridge.efficiency.toFixed(1);
+  const eff = Number.isInteger(bridge.efficiency)
+    ? String(bridge.efficiency)
+    : bridge.efficiency.toFixed(1);
 
   return [
     `${name}`,
@@ -29,7 +31,7 @@ export function generateTextSummary(
     `Total days off: ${result.totalDaysOff}`,
     `CP used: ${result.cpUsed}`,
     `RTT used: ${result.rttUsed}`,
-    `Average efficiency: ${result.averageEfficiency.toFixed(1)}:1`,
+    `Average efficiency: ${Number.isInteger(result.averageEfficiency) ? result.averageEfficiency : result.averageEfficiency.toFixed(1)}:1`,
     `Number of breaks: ${result.selectedBridges.length}`,
   ].join("\n");
 

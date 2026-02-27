@@ -1,19 +1,19 @@
-import { CalendarDays, Palmtree, TrendingUp, BarChart3 } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/lib/utils'
-import type { OptimizationResult } from '@/engine/types'
+import { CalendarDays, Palmtree, TrendingUp, BarChart3 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import type { OptimizationResult } from "@/engine/types";
 
 interface StatItemProps {
-  readonly icon: React.ReactNode
-  readonly label: string
-  readonly value: string | number
-  readonly sub?: string
-  readonly className?: string
+  readonly icon: React.ReactNode;
+  readonly label: string;
+  readonly value: string | number;
+  readonly sub?: string;
+  readonly className?: string;
 }
 
 function StatItem({ icon, label, value, sub, className }: StatItemProps) {
   return (
-    <Card className={cn('flex-1 min-w-[120px]', className)}>
+    <Card className={cn("flex-1 min-w-[120px]", className)}>
       <CardContent className="flex items-center gap-3 p-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary">
           {icon}
@@ -25,16 +25,20 @@ function StatItem({ icon, label, value, sub, className }: StatItemProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 interface SummaryStatsProps {
-  readonly result: OptimizationResult
-  readonly cpBudget: number
-  readonly rttBudget: number
+  readonly result: OptimizationResult;
+  readonly cpBudget: number;
+  readonly rttBudget: number;
 }
 
-export function SummaryStats({ result, cpBudget, rttBudget }: SummaryStatsProps) {
+export function SummaryStats({
+  result,
+  cpBudget,
+  rttBudget,
+}: SummaryStatsProps) {
   return (
     <div className="flex flex-wrap gap-2">
       <StatItem
@@ -57,7 +61,7 @@ export function SummaryStats({ result, cpBudget, rttBudget }: SummaryStatsProps)
       <StatItem
         icon={<TrendingUp className="h-4 w-4" />}
         label="Avg efficiency"
-        value={`${result.averageEfficiency.toFixed(1)}:1`}
+        value={`${Number.isInteger(result.averageEfficiency) ? result.averageEfficiency : result.averageEfficiency.toFixed(1)}:1`}
       />
       <StatItem
         icon={<BarChart3 className="h-4 w-4" />}
@@ -65,5 +69,5 @@ export function SummaryStats({ result, cpBudget, rttBudget }: SummaryStatsProps)
         value={result.selectedBridges.length}
       />
     </div>
-  )
+  );
 }

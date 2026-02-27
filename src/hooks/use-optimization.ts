@@ -62,15 +62,12 @@ export function useOptimization(config: AppConfig): OptimizationOutput {
     }
 
     const totalPtoCost = selectedBridges.reduce((sum, b) => sum + b.ptoCost, 0);
-    const totalGained = selectedBridges.reduce(
-      (sum, b) => sum + b.gainedDays,
-      0,
-    );
-    const averageEfficiency = totalPtoCost > 0 ? totalGained / totalPtoCost : 0;
     const totalDaysOff = selectedBridges.reduce(
       (sum, b) => sum + b.totalDaysOff,
       0,
     );
+    const averageEfficiency =
+      totalPtoCost > 0 ? totalDaysOff / totalPtoCost : 0;
 
     const result: OptimizationResult = {
       selectedBridges,

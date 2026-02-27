@@ -130,8 +130,8 @@ export function findBridges(calendar: DayInfo[]): Bridge[] {
           const adjacentHolidays = findAdjacentHolidays(gapDays, calendarMap);
           const cluster = findClusterBounds(gapDays, calendarMap);
           const ptoCost = gapDays.length;
-          const gainedDays = cluster.totalDaysOff - cluster.weekendsAndHolidays;
-          const efficiency = ptoCost > 0 ? gainedDays / ptoCost : 0;
+          const gainedDays = cluster.totalDaysOff - ptoCost;
+          const efficiency = ptoCost > 0 ? cluster.totalDaysOff / ptoCost : 0;
 
           bridges.push({
             id: `bridge-${bridgeIndex++}`,

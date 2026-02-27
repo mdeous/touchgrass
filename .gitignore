@@ -25,3 +25,6 @@ dist-ssr
 
 # Generated holiday data
 src/data/generated/
+
+# PWA dev directory
+dev-dist

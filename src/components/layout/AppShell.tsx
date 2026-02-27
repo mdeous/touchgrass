@@ -18,6 +18,7 @@ import { useOptimization } from "@/hooks/use-optimization";
 import { useCalendarInteraction } from "@/hooks/use-calendar-interaction";
 import { useUrlState } from "@/hooks/use-url-state";
 import { useAppStore } from "@/store/app-store";
+import { ReloadPrompt } from "@/components/pwa/ReloadPrompt";
 import type { AppConfig } from "@/engine/types";
 
 export function AppShell() {
@@ -121,6 +122,7 @@ export function AppShell() {
       </main>
 
       <Toaster position="bottom-right" />
+      <ReloadPrompt />
     </div>
   );
 }

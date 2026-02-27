@@ -7,7 +7,10 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { groupAllocations, generateTimeOffSummary } from "@/export/text-summary";
+import {
+  groupAllocations,
+  generateTimeOffSummary,
+} from "@/export/text-summary";
 import type { Allocation } from "@/engine/types";
 import { getCountryMeta } from "@/data/country-meta";
 
@@ -36,9 +39,9 @@ export function TimeOffSummary({ allocations, country }: TimeOffSummaryProps) {
     <Accordion type="single" collapsible>
       <AccordionItem
         value="time-off-summary"
-        className="border rounded-lg px-4"
+        className="rounded-xl border bg-card px-4"
       >
-        <AccordionTrigger className="text-sm font-medium">
+        <AccordionTrigger className="text-xs font-medium text-muted-foreground uppercase tracking-tight">
           Time off summary
         </AccordionTrigger>
         <AccordionContent>

@@ -17,28 +17,27 @@ import { CustomHolidayPicker } from "@/components/config/CustomHolidayPicker";
 export function ConfigPanel() {
   return (
     <div className="flex flex-col gap-4">
-      <CountrySelector />
-
       <Accordion
         type="multiple"
-        defaultValue={["leave-budget", "location", "strategy"]}
+        defaultValue={["location", "leave-budget", "strategy"]}
         className="w-full"
       >
-        <AccordionItem value="leave-budget">
-          <AccordionTrigger>Leave Budget</AccordionTrigger>
-          <AccordionContent>
-            <PtoBudgetInputs />
-          </AccordionContent>
-        </AccordionItem>
-
         <AccordionItem value="location">
           <AccordionTrigger>Location</AccordionTrigger>
           <AccordionContent>
             <div className="flex flex-col gap-4">
+              <CountrySelector />
               <SubdivisionSelector />
               <SchoolZoneSelector />
               <WeekendSelector />
             </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="leave-budget">
+          <AccordionTrigger>Leave Budget</AccordionTrigger>
+          <AccordionContent>
+            <PtoBudgetInputs />
           </AccordionContent>
         </AccordionItem>
 

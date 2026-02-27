@@ -42,32 +42,49 @@ export function ResultsPanel({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Optimization Results</h2>
-        <ExportActions result={result} config={config} />
+    <div className="flex flex-col gap-1">
+      {/* Header with stats */}
+      <div className="rounded-xl border bg-card p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold tracking-tight text-muted-foreground uppercase">
+            Results
+          </h2>
+          <ExportActions result={result} config={config} />
+        </div>
+        <SummaryStats
+          result={result}
+          ptoBudget={config.ptoBudget}
+          recoveryBudget={config.recoveryBudget}
+          country={config.country}
+        />
       </div>
-      <SummaryStats
-        result={result}
-        ptoBudget={config.ptoBudget}
-        recoveryBudget={config.recoveryBudget}
+
+      {/* Time off summary */}
+      <TimeOffSummary
+        allocations={result.allocations}
         country={config.country}
       />
-      <TimeOffSummary allocations={result.allocations} country={config.country} />
-      <div className="flex flex-col gap-2">
-        {ponts.map((bridge) => {
-          const isDisabled = disabledSet.has(bridge.pontName!);
-          const isSelected = selectedSet.has(bridge.pontName);
-          return (
-            <ClusterCard
-              key={bridge.id}
-              bridge={bridge}
-              disabled={isDisabled}
-              selected={isSelected}
-              onHover={onBridgeHover}
-            />
-          );
-        })}
+
+      {/* Bridge list */}
+      <div className="rounded-xl border bg-card p-2">
+        <p className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-tight">
+          Bridges ({result.selectedBridges.length} selected)
+        </p>
+        <div className="flex flex-col">
+          {ponts.map((bridge) => {
+            const isDisabled = disabledSet.has(bridge.pontName!);
+            const isSelected = selectedSet.has(bridge.pontName);
+            return (
+              <ClusterCard
+                key={bridge.id}
+                bridge={bridge}
+                disabled={isDisabled}
+                selected={isSelected}
+                onHover={onBridgeHover}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );

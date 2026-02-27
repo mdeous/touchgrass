@@ -46,18 +46,30 @@ export function ExportActions({ result, config }: ExportActionsProps) {
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
-      <Button variant="outline" size="sm" onClick={handleDownloadIcs}>
-        <Download className="h-4 w-4" />
-        Download .ics
+    <div className="flex items-center gap-1">
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={handleDownloadIcs}
+        title="Download .ics"
+      >
+        <Download className="h-3.5 w-3.5" />
       </Button>
-      <Button variant="outline" size="sm" onClick={handleCopySummary}>
-        <Copy className="h-4 w-4" />
-        Copy Summary
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={handleCopySummary}
+        title="Copy summary"
+      >
+        <Copy className="h-3.5 w-3.5" />
       </Button>
-      <Button variant="outline" size="sm" onClick={handleShareLink}>
-        <Share2 className="h-4 w-4" />
-        Share Link
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={handleShareLink}
+        title="Share link"
+      >
+        <Share2 className="h-3.5 w-3.5" />
       </Button>
     </div>
   );

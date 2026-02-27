@@ -92,12 +92,11 @@ export function AppShell() {
           </Sheet>
         </div>
 
-        <aside className="hidden w-[280px] shrink-0 xl:block">
+        <aside className="hidden w-[280px] shrink-0 rounded-xl border bg-card p-4 xl:block">
           <ConfigPanel />
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col gap-4">
-          <CalendarLegend />
           {loading ? (
             <div className="flex items-center justify-center py-12 text-muted-foreground">
               <p className="text-sm">Loading holidays...</p>
@@ -109,6 +108,7 @@ export function AppShell() {
               onToggle={onToggle}
             />
           )}
+          <CalendarLegend />
         </div>
 
         <aside className="w-full shrink-0 xl:w-[320px]">

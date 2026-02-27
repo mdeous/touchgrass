@@ -1,6 +1,4 @@
-import { CalendarDays, Palmtree, TrendingUp, BarChart3 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { CalendarDays, Palmtree, TrendingUp } from "lucide-react";
 import type { OptimizationResult } from "@/engine/types";
 import { getCountryMeta } from "@/data/country-meta";
 
@@ -9,23 +7,20 @@ interface StatItemProps {
   readonly label: string;
   readonly value: string | number;
   readonly sub?: string;
-  readonly className?: string;
 }
 
-function StatItem({ icon, label, value, sub, className }: StatItemProps) {
+function StatItem({ icon, label, value, sub }: StatItemProps) {
   return (
-    <Card className={cn("flex-1 min-w-[120px]", className)}>
-      <CardContent className="flex items-center gap-3 p-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary">
-          {icon}
-        </div>
-        <div>
-          <p className="text-lg font-bold leading-none">{value}</p>
-          <p className="text-xs text-muted-foreground">{label}</p>
-          {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex items-center gap-2.5">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-base font-bold leading-tight">{value}</p>
+        <p className="truncate text-[11px] text-muted-foreground">{label}</p>
+        {sub && <p className="text-[10px] text-muted-foreground/70">{sub}</p>}
+      </div>
+    </div>
   );
 }
 
@@ -43,38 +38,36 @@ export function SummaryStats({
   country,
 }: SummaryStatsProps) {
   const meta = getCountryMeta(country);
+  const effDisplay = Number.isInteger(result.averageEfficiency)
+    ? result.averageEfficiency
+    : result.averageEfficiency.toFixed(1);
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="grid grid-cols-2 gap-x-4 gap-y-3">
       <StatItem
         icon={<CalendarDays className="h-4 w-4" />}
         label="Total days off"
         value={result.totalDaysOff}
       />
       <StatItem
+        icon={<TrendingUp className="h-4 w-4" />}
+        label="Avg efficiency"
+        value={`${effDisplay}:1`}
+      />
+      <StatItem
         icon={<Palmtree className="h-4 w-4" />}
         label={`${meta.ptoLabel || "PTO"} used`}
-        value={`${result.ptoUsed}/${ptoBudget}`}
+        value={`${result.ptoUsed} / ${ptoBudget}`}
         sub={`${ptoBudget - result.ptoUsed} remaining`}
       />
       {meta.hasRecoveryDays && (
         <StatItem
           icon={<Palmtree className="h-4 w-4" />}
           label={`${meta.recoveryLabel || "Recovery"} used`}
-          value={`${result.recoveryUsed}/${recoveryBudget}`}
+          value={`${result.recoveryUsed} / ${recoveryBudget}`}
           sub={`${recoveryBudget - result.recoveryUsed} remaining`}
         />
       )}
-      <StatItem
-        icon={<TrendingUp className="h-4 w-4" />}
-        label="Avg efficiency"
-        value={`${Number.isInteger(result.averageEfficiency) ? result.averageEfficiency : result.averageEfficiency.toFixed(1)}:1`}
-      />
-      <StatItem
-        icon={<BarChart3 className="h-4 w-4" />}
-        label="Breaks"
-        value={result.selectedBridges.length}
-      />
     </div>
   );
 }

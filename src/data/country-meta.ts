@@ -96,7 +96,7 @@ const ALL_COUNTRIES: readonly CountryMeta[] = [
   country("FR", "France", 25, {
     hasRecoveryDays: true,
     defaultRecoveryBudget: 9,
-    ptoLabel: "PTO (CP)",
+    ptoLabel: "PTO",
     recoveryLabel: "RTT",
     hasSchoolZones: true,
   }),

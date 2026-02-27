@@ -1,0 +1,45 @@
+import { format, getDay } from 'date-fns'
+import { DayCell } from '@/components/calendar/DayCell'
+import type { DayInfo } from '@/engine/types'
+
+const DAY_HEADERS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
+
+function mondayOffset(firstDayOfMonth: Date): number {
+  const dow = getDay(firstDayOfMonth)
+  return dow === 0 ? 6 : dow - 1
+}
+
+interface MonthViewProps {
+  readonly month: number
+  readonly year: number
+  readonly days: readonly DayInfo[]
+  readonly onToggle: (dateKey: string) => void
+}
+
+export function MonthView({ month, year, days, onToggle }: MonthViewProps) {
+  const firstDay = new Date(year, month, 1)
+  const offset = mondayOffset(firstDay)
+  const monthName = format(firstDay, 'MMMM')
+
+  return (
+    <div className="flex flex-col gap-1">
+      <h3 className="text-sm font-semibold text-foreground">{monthName}</h3>
+      <div className="grid grid-cols-7 gap-0.5">
+        {DAY_HEADERS.map((d) => (
+          <div
+            key={d}
+            className="flex h-6 w-7 items-center justify-center text-[10px] font-medium text-muted-foreground"
+          >
+            {d}
+          </div>
+        ))}
+        {Array.from({ length: offset }, (_, i) => (
+          <div key={`empty-${i}`} className="h-7 w-7" />
+        ))}
+        {days.map((day) => (
+          <DayCell key={day.dateKey} day={day} onToggle={onToggle} />
+        ))}
+      </div>
+    </div>
+  )
+}

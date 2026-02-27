@@ -64,10 +64,10 @@ export function AppShell() {
   );
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
+    <div className="flex min-h-screen flex-col">
       <Header />
 
-      <main className="mx-auto flex w-full max-w-screen-2xl flex-1 flex-col gap-4 overflow-hidden p-4 xl:flex-row">
+      <main className="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 p-4 xl:flex-row xl:items-start">
         {/* Mobile config trigger */}
         <div className="xl:hidden">
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -88,13 +88,11 @@ export function AppShell() {
           </Sheet>
         </div>
 
-        {/* Left sidebar — scrolls independently */}
-        <aside className="hidden w-[280px] shrink-0 overflow-y-auto xl:block">
+        <aside className="hidden w-[280px] shrink-0 xl:block">
           <ConfigPanel />
         </aside>
 
-        {/* Calendar — scrolls independently */}
-        <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto">
+        <div className="flex min-w-0 flex-1 flex-col gap-4">
           <CalendarLegend />
           <CalendarGrid
             days={calendar}
@@ -103,8 +101,7 @@ export function AppShell() {
           />
         </div>
 
-        {/* Right sidebar — scrolls independently */}
-        <aside className="w-full shrink-0 overflow-y-auto xl:w-[320px]">
+        <aside className="w-full shrink-0 xl:w-[320px]">
           <ResultsPanel
             result={result}
             config={config}

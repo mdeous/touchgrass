@@ -101,11 +101,13 @@ function buildPontName(adjacentHolidayNames: readonly string[]): string | null {
   return adjacentHolidayNames[adjacentHolidayNames.length - 1];
 }
 
-export function findBridges(calendar: DayInfo[]): Bridge[] {
+export function findBridges(calendar: DayInfo[], today?: Date): Bridge[] {
   const calendarMap = new Map<string, DayInfo>();
   for (const day of calendar) {
     calendarMap.set(day.dateKey, day);
   }
+
+  const todayKey = format(today ?? new Date(), "yyyy-MM-dd");
 
   const bridges: Bridge[] = [];
   let gapDays: DayInfo[] = [];
@@ -116,6 +118,12 @@ export function findBridges(calendar: DayInfo[]): Bridge[] {
       gapDays.push(day);
     } else {
       if (gapDays.length > 0 && gapDays.length <= 4) {
+        const hasPastDay = gapDays.some((d) => d.dateKey < todayKey);
+        if (hasPastDay) {
+          gapDays = [];
+          continue;
+        }
+
         const beforeGap = calendarMap.get(
           format(addDays(gapDays[0].date, -1), "yyyy-MM-dd"),
         );

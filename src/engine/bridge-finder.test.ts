@@ -8,16 +8,18 @@ function makeConfig(overrides: Partial<AppConfig> = {}): AppConfig {
   return { ...DEFAULT_CONFIG, year: 2026, ...overrides };
 }
 
+const startOfYear = new Date(2026, 0, 1);
+
 describe("findBridges", () => {
   it("detects bridges in 2026 metropolitan France", () => {
     const calendar = buildCalendar(makeConfig());
-    const bridges = findBridges(calendar);
+    const bridges = findBridges(calendar, startOfYear);
     expect(bridges.length).toBeGreaterThan(0);
   });
 
   it("detects Ascension bridge (May 14 2026 is Thursday)", () => {
     const calendar = buildCalendar(makeConfig());
-    const bridges = findBridges(calendar);
+    const bridges = findBridges(calendar, startOfYear);
     const ascensionBridge = bridges.find((b) =>
       b.adjacentHolidays.some((h) => h.includes("Ascension")),
     );
@@ -27,7 +29,7 @@ describe("findBridges", () => {
 
   it("detects July 14 bridge", () => {
     const calendar = buildCalendar(makeConfig());
-    const bridges = findBridges(calendar);
+    const bridges = findBridges(calendar, startOfYear);
     const jul14Bridge = bridges.find((b) =>
       b.adjacentHolidays.some((h) => h.includes("Bastille")),
     );
@@ -36,7 +38,7 @@ describe("findBridges", () => {
 
   it("each bridge has a positive PTO cost", () => {
     const calendar = buildCalendar(makeConfig());
-    const bridges = findBridges(calendar);
+    const bridges = findBridges(calendar, startOfYear);
     for (const bridge of bridges) {
       expect(bridge.ptoCost).toBeGreaterThan(0);
     }
@@ -44,7 +46,7 @@ describe("findBridges", () => {
 
   it("each bridge has totalDaysOff >= ptoCost", () => {
     const calendar = buildCalendar(makeConfig());
-    const bridges = findBridges(calendar);
+    const bridges = findBridges(calendar, startOfYear);
     for (const bridge of bridges) {
       expect(bridge.totalDaysOff).toBeGreaterThanOrEqual(bridge.ptoCost);
     }
@@ -52,7 +54,7 @@ describe("findBridges", () => {
 
   it("bridge days array length equals ptoCost", () => {
     const calendar = buildCalendar(makeConfig());
-    const bridges = findBridges(calendar);
+    const bridges = findBridges(calendar, startOfYear);
     for (const bridge of bridges) {
       expect(bridge.days.length).toBe(bridge.ptoCost);
     }
@@ -60,7 +62,7 @@ describe("findBridges", () => {
 
   it("does not create bridges longer than 4 PTO days", () => {
     const calendar = buildCalendar(makeConfig());
-    const bridges = findBridges(calendar);
+    const bridges = findBridges(calendar, startOfYear);
     for (const bridge of bridges) {
       expect(bridge.ptoCost).toBeLessThanOrEqual(4);
     }
@@ -68,8 +70,22 @@ describe("findBridges", () => {
 
   it("bridges have unique IDs", () => {
     const calendar = buildCalendar(makeConfig());
-    const bridges = findBridges(calendar);
+    const bridges = findBridges(calendar, startOfYear);
     const ids = bridges.map((b) => b.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("excludes bridges with PTO days in the past", () => {
+    const calendar = buildCalendar(makeConfig());
+    const allBridges = findBridges(calendar, startOfYear);
+    const midYear = new Date(2026, 6, 1);
+    const futureBridges = findBridges(calendar, midYear);
+
+    expect(futureBridges.length).toBeLessThan(allBridges.length);
+    for (const bridge of futureBridges) {
+      for (const day of bridge.days) {
+        expect(day.getTime()).toBeGreaterThanOrEqual(midYear.getTime());
+      }
+    }
   });
 });

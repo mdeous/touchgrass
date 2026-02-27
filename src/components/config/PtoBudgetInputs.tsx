@@ -15,7 +15,7 @@ export function PtoBudgetInputs() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="pto-budget">{meta.ptoLabel || "PTO"}</Label>
+        <Label htmlFor="pto-budget">Paid Time Off</Label>
         <Input
           id="pto-budget"
           type="number"
@@ -34,7 +34,7 @@ export function PtoBudgetInputs() {
 
       {meta.hasRecoveryDays && (
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="recovery-budget">{meta.recoveryLabel || "Recovery Days"}</Label>
+          <Label htmlFor="recovery-budget">Recovery Days</Label>
           <Input
             id="recovery-budget"
             type="number"

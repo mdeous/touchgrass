@@ -7,8 +7,8 @@ function getBridgeDateKeys(bridge: Bridge): Set<string> {
 
 export function optimize(
   bridges: readonly Bridge[],
-  cpBudget: number,
-  rttBudget: number,
+  ptoBudget: number,
+  recoveryBudget: number,
   blackoutDates: readonly string[],
   preBookedDates: readonly string[],
   disabledBridges: readonly string[] = [],
@@ -19,7 +19,7 @@ export function optimize(
 
   const preBookedCost = preBookedDates.length;
 
-  let remainingBudget = cpBudget + rttBudget - preBookedCost;
+  let remainingBudget = ptoBudget + recoveryBudget - preBookedCost;
   const usedDates = new Set<string>();
   const selected: Bridge[] = [];
 

@@ -1,42 +1,42 @@
-import { useState } from 'react'
-import { format, parse } from 'date-fns'
-import { CalendarCheck, X } from 'lucide-react'
-import type { LeaveType } from '@/engine/types'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Calendar } from '@/components/ui/calendar'
+import { useState } from "react";
+import { format, parse } from "date-fns";
+import { CalendarCheck, X } from "lucide-react";
+import type { LeaveType } from "@/engine/types";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useAppStore } from '@/store/app-store'
+} from "@/components/ui/select";
+import { useAppStore } from "@/store/app-store";
 
-const DATE_FORMAT = 'yyyy-MM-dd'
+const DATE_FORMAT = "yyyy-MM-dd";
 
 function toDateKey(date: Date): string {
-  return format(date, DATE_FORMAT)
+  return format(date, DATE_FORMAT);
 }
 
 function fromDateKey(key: string): Date {
-  return parse(key, DATE_FORMAT, new Date())
+  return parse(key, DATE_FORMAT, new Date());
 }
 
 export function PreBookedPicker() {
-  const preBookedDates = useAppStore((s) => s.preBookedDates)
-  const preBookedTypes = useAppStore((s) => s.preBookedTypes)
-  const addPreBookedDate = useAppStore((s) => s.addPreBookedDate)
-  const removePreBookedDate = useAppStore((s) => s.removePreBookedDate)
-  const [leaveType, setLeaveType] = useState<LeaveType>('cp')
+  const preBookedDates = useAppStore((s) => s.preBookedDates);
+  const preBookedTypes = useAppStore((s) => s.preBookedTypes);
+  const addPreBookedDate = useAppStore((s) => s.addPreBookedDate);
+  const removePreBookedDate = useAppStore((s) => s.removePreBookedDate);
+  const [leaveType, setLeaveType] = useState<LeaveType>("pto");
 
-  const selectedDates = preBookedDates.map(fromDateKey)
+  const selectedDates = preBookedDates.map(fromDateKey);
 
   return (
     <div className="flex flex-col gap-2">
@@ -60,8 +60,8 @@ export function PreBookedPicker() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cp">CP</SelectItem>
-                  <SelectItem value="rtt">RTT</SelectItem>
+                  <SelectItem value="pto">PTO</SelectItem>
+                  <SelectItem value="recovery">RTT</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -69,14 +69,14 @@ export function PreBookedPicker() {
               mode="multiple"
               selected={selectedDates}
               onSelect={(dates) => {
-                if (!dates) return
-                const newKeys = new Set(dates.map(toDateKey))
-                const oldKeys = new Set(preBookedDates)
+                if (!dates) return;
+                const newKeys = new Set(dates.map(toDateKey));
+                const oldKeys = new Set(preBookedDates);
                 for (const key of newKeys) {
-                  if (!oldKeys.has(key)) addPreBookedDate(key, leaveType)
+                  if (!oldKeys.has(key)) addPreBookedDate(key, leaveType);
                 }
                 for (const key of oldKeys) {
-                  if (!newKeys.has(key)) removePreBookedDate(key)
+                  if (!newKeys.has(key)) removePreBookedDate(key);
                 }
               }}
             />
@@ -92,9 +92,9 @@ export function PreBookedPicker() {
         <div className="flex flex-wrap gap-1">
           {[...preBookedDates].sort().map((dateKey) => (
             <Badge key={dateKey} variant="outline" className="gap-1 pr-1">
-              {format(fromDateKey(dateKey), 'MMM d')}
+              {format(fromDateKey(dateKey), "MMM d")}
               <span className="text-xs font-semibold uppercase text-primary">
-                {preBookedTypes[dateKey] ?? 'cp'}
+                {(preBookedTypes[dateKey] ?? "pto") === "pto" ? "PTO" : "RTT"}
               </span>
               <button
                 type="button"
@@ -109,5 +109,5 @@ export function PreBookedPicker() {
         </div>
       )}
     </div>
-  )
+  );
 }

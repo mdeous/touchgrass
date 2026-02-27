@@ -26,8 +26,8 @@ export function AppShell() {
   const year = useAppStore((s) => s.year);
   const region = useAppStore((s) => s.region);
   const schoolZone = useAppStore((s) => s.schoolZone);
-  const cpBudget = useAppStore((s) => s.cpBudget);
-  const rttBudget = useAppStore((s) => s.rttBudget);
+  const ptoBudget = useAppStore((s) => s.ptoBudget);
+  const recoveryBudget = useAppStore((s) => s.recoveryBudget);
   const strategy = useAppStore((s) => s.strategy);
   const blackoutDates = useAppStore((s) => s.blackoutDates);
   const preBookedDates = useAppStore((s) => s.preBookedDates);
@@ -40,8 +40,8 @@ export function AppShell() {
     year,
     region,
     schoolZone,
-    cpBudget,
-    rttBudget,
+    ptoBudget,
+    recoveryBudget,
     strategy,
     blackoutDates,
     preBookedDates,
@@ -55,12 +55,12 @@ export function AppShell() {
 
   const { calendar, result, allBridges } = useOptimization(config);
 
-  const cpRemaining = config.cpBudget - result.cpUsed;
-  const rttRemaining = config.rttBudget - result.rttUsed;
+  const ptoRemaining = config.ptoBudget - result.ptoUsed;
+  const recoveryRemaining = config.recoveryBudget - result.recoveryUsed;
   const { onToggle } = useCalendarInteraction(
     calendar,
-    cpRemaining,
-    rttRemaining,
+    ptoRemaining,
+    recoveryRemaining,
   );
 
   return (

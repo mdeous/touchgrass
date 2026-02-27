@@ -15,13 +15,13 @@ export type DayType =
   | "workday"
   | "weekend"
   | "holiday"
-  | "cp"
-  | "rtt"
+  | "pto"
+  | "recovery"
   | "blackout"
-  | "prebooked-cp"
-  | "prebooked-rtt";
+  | "prebooked-pto"
+  | "prebooked-recovery";
 
-export type LeaveType = "cp" | "rtt";
+export type LeaveType = "pto" | "recovery";
 
 export interface Holiday {
   readonly date: Date;
@@ -62,8 +62,8 @@ export interface Allocation {
 export interface OptimizationResult {
   readonly selectedBridges: readonly Bridge[];
   readonly allocations: readonly Allocation[];
-  readonly cpUsed: number;
-  readonly rttUsed: number;
+  readonly ptoUsed: number;
+  readonly recoveryUsed: number;
   readonly totalDaysOff: number;
   readonly averageEfficiency: number;
 }
@@ -72,8 +72,8 @@ export interface AppConfig {
   readonly year: number;
   readonly region: Region;
   readonly schoolZone: SchoolZone;
-  readonly cpBudget: number;
-  readonly rttBudget: number;
+  readonly ptoBudget: number;
+  readonly recoveryBudget: number;
   readonly strategy: Strategy;
   readonly blackoutDates: readonly string[];
   readonly preBookedDates: readonly string[];
@@ -98,8 +98,8 @@ export const DEFAULT_CONFIG: AppConfig = {
   year: new Date().getFullYear(),
   region: "metropolitan",
   schoolZone: "none",
-  cpBudget: 25,
-  rttBudget: 9,
+  ptoBudget: 25,
+  recoveryBudget: 9,
   strategy: "balanced",
   blackoutDates: [],
   preBookedDates: [],

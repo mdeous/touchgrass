@@ -12,8 +12,8 @@ interface AppState extends AppConfig {
   setYear: (year: number) => void;
   setRegion: (region: Region) => void;
   setSchoolZone: (zone: SchoolZone) => void;
-  setCpBudget: (budget: number) => void;
-  setRttBudget: (budget: number) => void;
+  setPtoBudget: (budget: number) => void;
+  setRecoveryBudget: (budget: number) => void;
   setStrategy: (strategy: Strategy) => void;
   addBlackoutDate: (dateKey: string) => void;
   removeBlackoutDate: (dateKey: string) => void;
@@ -35,9 +35,9 @@ export const useAppStore = create<AppState>()((set) => ({
 
   setSchoolZone: (schoolZone) => set({ schoolZone }),
 
-  setCpBudget: (cpBudget) => set({ cpBudget }),
+  setPtoBudget: (ptoBudget) => set({ ptoBudget }),
 
-  setRttBudget: (rttBudget) => set({ rttBudget }),
+  setRecoveryBudget: (recoveryBudget) => set({ recoveryBudget }),
 
   setStrategy: (strategy) => set({ strategy }),
 

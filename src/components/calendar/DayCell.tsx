@@ -7,11 +7,11 @@ const dayTypeStyles: Record<DayType, string> = {
   workday: 'bg-background hover:bg-accent',
   weekend: 'bg-day-weekend text-muted-foreground',
   holiday: 'bg-day-holiday font-medium',
-  cp: 'bg-day-cp font-medium',
-  rtt: 'bg-day-rtt font-medium',
+  pto: 'bg-day-pto font-medium',
+  recovery: 'bg-day-recovery font-medium',
   blackout: 'bg-day-blackout text-muted-foreground',
-  'prebooked-cp': 'bg-day-prebooked font-medium',
-  'prebooked-rtt': 'bg-day-prebooked font-medium',
+  'prebooked-pto': 'bg-day-prebooked font-medium',
+  'prebooked-recovery': 'bg-day-prebooked font-medium',
 }
 
 interface DayCellProps {
@@ -33,7 +33,7 @@ function tooltipLabel(day: DayInfo): string {
 
 export function DayCell({ day, onToggle }: DayCellProps) {
   const dayNumber = day.date.getDate()
-  const isClickable = day.type === 'workday' || day.type === 'cp' || day.type === 'rtt'
+  const isClickable = day.type === 'workday' || day.type === 'pto' || day.type === 'recovery'
 
   return (
     <Tooltip>

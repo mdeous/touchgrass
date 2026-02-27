@@ -34,8 +34,8 @@ export function generateTextSummary(
     "",
     "-".repeat(30),
     `Total days off: ${result.totalDaysOff}`,
-    `CP used: ${result.cpUsed}`,
-    `RTT used: ${result.rttUsed}`,
+    `PTO used: ${result.ptoUsed}`,
+    `Recovery (RTT) used: ${result.recoveryUsed}`,
     `Average efficiency: ${Number.isInteger(result.averageEfficiency) ? result.averageEfficiency : result.averageEfficiency.toFixed(1)}:1`,
     `Number of breaks: ${result.selectedBridges.length}`,
   ].join("\n");
@@ -94,13 +94,13 @@ export interface TimeOffGroup {
 export function groupAllocations(
   allocations: readonly Allocation[],
 ): readonly TimeOffGroup[] {
-  const byType: Record<LeaveType, Date[]> = { cp: [], rtt: [] };
+  const byType: Record<LeaveType, Date[]> = { pto: [], recovery: [] };
   for (const a of allocations) {
     byType[a.leaveType].push(a.date);
   }
 
   const groups: TimeOffGroup[] = [];
-  for (const leaveType of ["cp", "rtt"] as const) {
+  for (const leaveType of ["pto", "recovery"] as const) {
     const dates = byType[leaveType];
     if (dates.length === 0) continue;
     const ranges = collapseToRanges(dates);
@@ -121,7 +121,7 @@ export function generateTimeOffSummary(
   if (groups.length === 0) return "";
 
   const sections = groups.map((g) => {
-    const label = g.leaveType.toUpperCase();
+    const label = g.leaveType === "pto" ? "PTO" : "Recovery (RTT)";
     const header = `${label} days to request (${g.count} day${g.count !== 1 ? "s" : ""})`;
     const lines = g.lines.map((l) => `  ${l}`).join("\n");
     return `${header}\n${lines}`;

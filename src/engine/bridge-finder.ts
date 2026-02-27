@@ -5,8 +5,8 @@ function isOffDay(day: DayInfo): boolean {
   return (
     day.type === "weekend" ||
     day.type === "holiday" ||
-    day.type === "prebooked-cp" ||
-    day.type === "prebooked-rtt"
+    day.type === "prebooked-pto" ||
+    day.type === "prebooked-recovery"
   );
 }
 

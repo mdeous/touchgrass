@@ -3,17 +3,17 @@ import type { Allocation, Bridge, LeaveType } from '@/engine/types'
 
 export function allocate(
   selectedBridges: readonly Bridge[],
-  cpBudget: number,
-  rttBudget: number,
+  ptoBudget: number,
+  recoveryBudget: number,
   preBookedTypes: Readonly<Record<string, LeaveType>>,
 ): Allocation[] {
-  let cpRemaining = cpBudget
-  let rttRemaining = rttBudget
+  let ptoRemaining = ptoBudget
+  let recoveryRemaining = recoveryBudget
 
   for (const dateKey of Object.keys(preBookedTypes)) {
     const type = preBookedTypes[dateKey]
-    if (type === 'cp') cpRemaining--
-    else rttRemaining--
+    if (type === 'pto') ptoRemaining--
+    else recoveryRemaining--
   }
 
   const preBookedAllocations: Allocation[] = Object.entries(preBookedTypes).map(
@@ -37,22 +37,22 @@ export function allocate(
       let assignedType: LeaveType
 
       if (isSingleDay) {
-        if (rttRemaining > 0) {
-          assignedType = 'rtt'
-          rttRemaining--
-        } else if (cpRemaining > 0) {
-          assignedType = 'cp'
-          cpRemaining--
+        if (recoveryRemaining > 0) {
+          assignedType = 'recovery'
+          recoveryRemaining--
+        } else if (ptoRemaining > 0) {
+          assignedType = 'pto'
+          ptoRemaining--
         } else {
           continue
         }
       } else {
-        if (cpRemaining > 0) {
-          assignedType = 'cp'
-          cpRemaining--
-        } else if (rttRemaining > 0) {
-          assignedType = 'rtt'
-          rttRemaining--
+        if (ptoRemaining > 0) {
+          assignedType = 'pto'
+          ptoRemaining--
+        } else if (recoveryRemaining > 0) {
+          assignedType = 'recovery'
+          recoveryRemaining--
         } else {
           continue
         }

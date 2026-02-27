@@ -49,8 +49,8 @@ export function ResultsPanel({
       </div>
       <SummaryStats
         result={result}
-        cpBudget={config.cpBudget}
-        rttBudget={config.rttBudget}
+        ptoBudget={config.ptoBudget}
+        recoveryBudget={config.recoveryBudget}
       />
       <TimeOffSummary allocations={result.allocations} />
       <div className="flex flex-col gap-2">

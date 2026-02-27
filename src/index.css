@@ -26,8 +26,8 @@
 
   --day-weekend: oklch(0.93 0 0);
   --day-holiday: oklch(0.88 0.08 25);
-  --day-cp: oklch(0.85 0.12 145);
-  --day-rtt: oklch(0.85 0.1 185);
+  --day-pto: oklch(0.85 0.12 145);
+  --day-recovery: oklch(0.85 0.1 185);
   --day-blackout: oklch(0.3 0 0);
   --day-prebooked: oklch(0.85 0.1 300);
   --day-school: oklch(0.92 0.06 85);
@@ -56,8 +56,8 @@
 
   --day-weekend: oklch(0.22 0 0);
   --day-holiday: oklch(0.35 0.08 25);
-  --day-cp: oklch(0.35 0.12 145);
-  --day-rtt: oklch(0.35 0.1 185);
+  --day-pto: oklch(0.35 0.12 145);
+  --day-recovery: oklch(0.35 0.1 185);
   --day-blackout: oklch(0.15 0 0);
   --day-prebooked: oklch(0.35 0.1 300);
   --day-school: oklch(0.28 0.06 85);
@@ -87,8 +87,8 @@
 
   --color-day-weekend: var(--day-weekend);
   --color-day-holiday: var(--day-holiday);
-  --color-day-cp: var(--day-cp);
-  --color-day-rtt: var(--day-rtt);
+  --color-day-pto: var(--day-pto);
+  --color-day-recovery: var(--day-recovery);
   --color-day-blackout: var(--day-blackout);
   --color-day-prebooked: var(--day-prebooked);
   --color-day-school: var(--day-school);

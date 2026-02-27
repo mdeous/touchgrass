@@ -40,9 +40,9 @@ export function encodeConfig(config: AppConfig): string {
   if (config.region !== DEFAULT_CONFIG.region) compact.r = config.region;
   if (config.schoolZone !== DEFAULT_CONFIG.schoolZone)
     compact.z = config.schoolZone;
-  if (config.cpBudget !== DEFAULT_CONFIG.cpBudget) compact.c = config.cpBudget;
-  if (config.rttBudget !== DEFAULT_CONFIG.rttBudget)
-    compact.t = config.rttBudget;
+  if (config.ptoBudget !== DEFAULT_CONFIG.ptoBudget) compact.c = config.ptoBudget;
+  if (config.recoveryBudget !== DEFAULT_CONFIG.recoveryBudget)
+    compact.t = config.recoveryBudget;
   if (config.strategy !== DEFAULT_CONFIG.strategy) compact.s = config.strategy;
   if (config.blackoutDates.length > 0) compact.b = [...config.blackoutDates];
   if (config.preBookedDates.length > 0) compact.p = [...config.preBookedDates];
@@ -67,8 +67,8 @@ export function decodeConfig(hash: string): AppConfig | null {
       year: compact.y ?? DEFAULT_CONFIG.year,
       region: (compact.r as Region) ?? DEFAULT_CONFIG.region,
       schoolZone: (compact.z as SchoolZone) ?? DEFAULT_CONFIG.schoolZone,
-      cpBudget: compact.c ?? DEFAULT_CONFIG.cpBudget,
-      rttBudget: compact.t ?? DEFAULT_CONFIG.rttBudget,
+      ptoBudget: compact.c ?? DEFAULT_CONFIG.ptoBudget,
+      recoveryBudget: compact.t ?? DEFAULT_CONFIG.recoveryBudget,
       strategy: (compact.s as Strategy) ?? DEFAULT_CONFIG.strategy,
       blackoutDates: compact.b ?? [],
       preBookedDates: compact.p ?? [],

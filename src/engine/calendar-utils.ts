@@ -62,8 +62,8 @@ export function buildCalendar(config: AppConfig): DayInfo[] {
     if (blackoutSet.has(dateKey)) {
       type = 'blackout'
     } else if (preBookedSet.has(dateKey)) {
-      const leaveType = preBookedTypes[dateKey] ?? 'cp'
-      type = leaveType === 'rtt' ? 'prebooked-rtt' : 'prebooked-cp'
+      const leaveType = preBookedTypes[dateKey] ?? 'pto'
+      type = leaveType === 'recovery' ? 'prebooked-recovery' : 'prebooked-pto'
     } else if (holiday) {
       type = 'holiday'
     } else if (isWeekend) {

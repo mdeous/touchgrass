@@ -9,8 +9,8 @@ function getConfigFromStore(): AppConfig {
     year: s.year,
     region: s.region,
     schoolZone: s.schoolZone,
-    cpBudget: s.cpBudget,
-    rttBudget: s.rttBudget,
+    ptoBudget: s.ptoBudget,
+    recoveryBudget: s.recoveryBudget,
     strategy: s.strategy,
     blackoutDates: s.blackoutDates,
     preBookedDates: s.preBookedDates,
@@ -25,8 +25,8 @@ export function useUrlState() {
   const year = useAppStore((s) => s.year);
   const region = useAppStore((s) => s.region);
   const schoolZone = useAppStore((s) => s.schoolZone);
-  const cpBudget = useAppStore((s) => s.cpBudget);
-  const rttBudget = useAppStore((s) => s.rttBudget);
+  const ptoBudget = useAppStore((s) => s.ptoBudget);
+  const recoveryBudget = useAppStore((s) => s.recoveryBudget);
   const strategy = useAppStore((s) => s.strategy);
   const blackoutDates = useAppStore((s) => s.blackoutDates);
   const preBookedDates = useAppStore((s) => s.preBookedDates);
@@ -50,8 +50,8 @@ export function useUrlState() {
     store.setYear(decoded.year);
     store.setRegion(decoded.region);
     store.setSchoolZone(decoded.schoolZone);
-    store.setCpBudget(decoded.cpBudget);
-    store.setRttBudget(decoded.rttBudget);
+    store.setPtoBudget(decoded.ptoBudget);
+    store.setRecoveryBudget(decoded.recoveryBudget);
     store.setStrategy(decoded.strategy);
   }, []);
 
@@ -75,8 +75,8 @@ export function useUrlState() {
     year,
     region,
     schoolZone,
-    cpBudget,
-    rttBudget,
+    ptoBudget,
+    recoveryBudget,
     strategy,
     blackoutDates,
     preBookedDates,

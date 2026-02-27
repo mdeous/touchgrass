@@ -19,16 +19,16 @@ function makeBridge(overrides: Partial<Bridge> & { id: string }): Bridge {
 }
 
 describe('allocate', () => {
-  it('assigns RTT to single-day bridges', () => {
+  it('assigns recovery to single-day bridges', () => {
     const bridges = [
       makeBridge({ id: 'a', ptoCost: 1, days: [new Date(2026, 4, 15)] }),
     ]
     const allocations = allocate(bridges, 25, 9, {})
     expect(allocations).toHaveLength(1)
-    expect(allocations[0].leaveType).toBe('rtt')
+    expect(allocations[0].leaveType).toBe('recovery')
   })
 
-  it('assigns CP to multi-day bridges', () => {
+  it('assigns PTO to multi-day bridges', () => {
     const bridges = [
       makeBridge({
         id: 'b',
@@ -39,20 +39,20 @@ describe('allocate', () => {
     const allocations = allocate(bridges, 25, 9, {})
     expect(allocations).toHaveLength(3)
     for (const a of allocations) {
-      expect(a.leaveType).toBe('cp')
+      expect(a.leaveType).toBe('pto')
     }
   })
 
-  it('falls back to CP when RTT exhausted for single-day', () => {
+  it('falls back to PTO when recovery exhausted for single-day', () => {
     const bridges = [
       makeBridge({ id: 'a', ptoCost: 1, days: [new Date(2026, 4, 15)] }),
     ]
     const allocations = allocate(bridges, 25, 0, {})
     expect(allocations).toHaveLength(1)
-    expect(allocations[0].leaveType).toBe('cp')
+    expect(allocations[0].leaveType).toBe('pto')
   })
 
-  it('falls back to RTT when CP exhausted for multi-day', () => {
+  it('falls back to recovery when PTO exhausted for multi-day', () => {
     const bridges = [
       makeBridge({
         id: 'c',
@@ -63,13 +63,13 @@ describe('allocate', () => {
     const allocations = allocate(bridges, 0, 9, {})
     expect(allocations).toHaveLength(2)
     for (const a of allocations) {
-      expect(a.leaveType).toBe('rtt')
+      expect(a.leaveType).toBe('recovery')
     }
   })
 
   it('includes pre-booked allocations', () => {
     const preBooked: Record<string, LeaveType> = {
-      '2026-03-16': 'cp',
+      '2026-03-16': 'pto',
     }
     const bridges = [
       makeBridge({ id: 'a', ptoCost: 1, days: [new Date(2026, 4, 15)] }),
@@ -80,12 +80,12 @@ describe('allocate', () => {
       (a) => a.date.getMonth() === 2 && a.date.getDate() === 16,
     )
     expect(preBookedAlloc).toBeDefined()
-    expect(preBookedAlloc!.leaveType).toBe('cp')
+    expect(preBookedAlloc!.leaveType).toBe('pto')
   })
 
   it('deducts pre-booked from budgets', () => {
     const preBooked: Record<string, LeaveType> = {
-      '2026-03-16': 'rtt',
+      '2026-03-16': 'recovery',
     }
     const bridges = [
       makeBridge({ id: 'a', ptoCost: 1, days: [new Date(2026, 4, 15)] }),

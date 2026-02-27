@@ -8,8 +8,8 @@ interface CalendarInteraction {
 
 export function useCalendarInteraction(
   calendar: readonly DayInfo[],
-  cpRemaining: number,
-  rttRemaining: number,
+  ptoRemaining: number,
+  recoveryRemaining: number,
 ): CalendarInteraction {
   const toggleManualOverride = useAppStore((s) => s.toggleManualOverride)
   const manualOverrides = useAppStore((s) => s.manualOverrides)
@@ -26,17 +26,17 @@ export function useCalendarInteraction(
         return
       }
 
-      if (day.type === 'cp' || day.type === 'rtt') {
+      if (day.type === 'pto' || day.type === 'recovery') {
         toggleManualOverride(dateKey, null)
         return
       }
 
       if (day.type !== 'workday') return
 
-      const leaveType: LeaveType = rttRemaining > 0 ? 'rtt' : cpRemaining > 0 ? 'cp' : 'cp'
+      const leaveType: LeaveType = recoveryRemaining > 0 ? 'recovery' : ptoRemaining > 0 ? 'pto' : 'pto'
       toggleManualOverride(dateKey, leaveType)
     },
-    [calendar, cpRemaining, rttRemaining, manualOverrides, toggleManualOverride],
+    [calendar, ptoRemaining, recoveryRemaining, manualOverrides, toggleManualOverride],
   )
 
   return { onToggle }

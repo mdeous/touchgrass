@@ -1,26 +1,26 @@
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useAppStore } from '@/store/app-store'
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAppStore } from "@/store/app-store";
 
 export function PtoBudgetInputs() {
-  const cpBudget = useAppStore((s) => s.cpBudget)
-  const rttBudget = useAppStore((s) => s.rttBudget)
-  const setCpBudget = useAppStore((s) => s.setCpBudget)
-  const setRttBudget = useAppStore((s) => s.setRttBudget)
+  const ptoBudget = useAppStore((s) => s.ptoBudget);
+  const recoveryBudget = useAppStore((s) => s.recoveryBudget);
+  const setPtoBudget = useAppStore((s) => s.setPtoBudget);
+  const setRecoveryBudget = useAppStore((s) => s.setRecoveryBudget);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="cp-budget">Conges Payes (CP)</Label>
+        <Label htmlFor="pto-budget">Paid Time-Off (PTO)</Label>
         <Input
-          id="cp-budget"
+          id="pto-budget"
           type="number"
           min={0}
           max={50}
-          value={cpBudget}
+          value={ptoBudget}
           onChange={(e) => {
-            const val = Math.max(0, Math.min(50, Number(e.target.value) || 0))
-            setCpBudget(val)
+            const val = Math.max(0, Math.min(50, Number(e.target.value) || 0));
+            setPtoBudget(val);
           }}
         />
         <p className="text-xs text-muted-foreground">
@@ -29,22 +29,22 @@ export function PtoBudgetInputs() {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="rtt-budget">RTT</Label>
+        <Label htmlFor="recovery-budget">Recovery Days (RTT)</Label>
         <Input
-          id="rtt-budget"
+          id="recovery-budget"
           type="number"
           min={0}
           max={50}
-          value={rttBudget}
+          value={recoveryBudget}
           onChange={(e) => {
-            const val = Math.max(0, Math.min(50, Number(e.target.value) || 0))
-            setRttBudget(val)
+            const val = Math.max(0, Math.min(50, Number(e.target.value) || 0));
+            setRecoveryBudget(val);
           }}
         />
         <p className="text-xs text-muted-foreground">
-          Working time reduction days (default 9)
+          Recovery days available (default 9)
         </p>
       </div>
     </div>
-  )
+  );
 }

@@ -41,24 +41,24 @@ export function useOptimization(config: AppConfig): OptimizationOutput {
     const scored = scoreBridges(bridges, config.strategy);
     const selectedBridges = optimize(
       scored,
-      config.cpBudget,
-      config.rttBudget,
+      config.ptoBudget,
+      config.recoveryBudget,
       config.blackoutDates,
       config.preBookedDates,
       config.disabledBridges,
     );
     const allAllocations = allocate(
       selectedBridges,
-      config.cpBudget,
-      config.rttBudget,
+      config.ptoBudget,
+      config.recoveryBudget,
       config.preBookedTypes,
     );
 
-    let cpUsed = 0;
-    let rttUsed = 0;
+    let ptoUsed = 0;
+    let recoveryUsed = 0;
     for (const a of allAllocations) {
-      if (a.leaveType === "cp") cpUsed++;
-      else rttUsed++;
+      if (a.leaveType === "pto") ptoUsed++;
+      else recoveryUsed++;
     }
 
     const totalPtoCost = selectedBridges.reduce((sum, b) => sum + b.ptoCost, 0);
@@ -72,8 +72,8 @@ export function useOptimization(config: AppConfig): OptimizationOutput {
     const result: OptimizationResult = {
       selectedBridges,
       allocations: allAllocations,
-      cpUsed,
-      rttUsed,
+      ptoUsed,
+      recoveryUsed,
       totalDaysOff,
       averageEfficiency,
     };

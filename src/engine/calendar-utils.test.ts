@@ -57,11 +57,11 @@ describe('buildCalendar', () => {
     const calendar = buildCalendar(
       makeConfig({
         preBookedDates: ['2026-03-16'],
-        preBookedTypes: { '2026-03-16': 'rtt' },
+        preBookedTypes: { '2026-03-16': 'recovery' },
       }),
     )
     const day = calendar.find((d) => d.dateKey === '2026-03-16')
-    expect(day!.type).toBe('prebooked-rtt')
+    expect(day!.type).toBe('prebooked-recovery')
   })
 
   it('applies custom holidays', () => {

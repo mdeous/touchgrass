@@ -30,14 +30,14 @@ function StatItem({ icon, label, value, sub, className }: StatItemProps) {
 
 interface SummaryStatsProps {
   readonly result: OptimizationResult;
-  readonly cpBudget: number;
-  readonly rttBudget: number;
+  readonly ptoBudget: number;
+  readonly recoveryBudget: number;
 }
 
 export function SummaryStats({
   result,
-  cpBudget,
-  rttBudget,
+  ptoBudget,
+  recoveryBudget,
 }: SummaryStatsProps) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -48,15 +48,15 @@ export function SummaryStats({
       />
       <StatItem
         icon={<Palmtree className="h-4 w-4" />}
-        label="CP used"
-        value={`${result.cpUsed}/${cpBudget}`}
-        sub={`${cpBudget - result.cpUsed} remaining`}
+        label="PTO used"
+        value={`${result.ptoUsed}/${ptoBudget}`}
+        sub={`${ptoBudget - result.ptoUsed} remaining`}
       />
       <StatItem
         icon={<Palmtree className="h-4 w-4" />}
-        label="RTT used"
-        value={`${result.rttUsed}/${rttBudget}`}
-        sub={`${rttBudget - result.rttUsed} remaining`}
+        label="Recovery used"
+        value={`${result.recoveryUsed}/${recoveryBudget}`}
+        sub={`${recoveryBudget - result.recoveryUsed} remaining`}
       />
       <StatItem
         icon={<TrendingUp className="h-4 w-4" />}

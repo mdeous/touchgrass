@@ -1,14 +1,11 @@
-import type {
-  AppConfig,
-  Region,
-  SchoolZone,
-  Strategy,
-  LeaveType,
-} from "@/engine/types";
+import type { AppConfig, SchoolZone, Strategy, LeaveType } from "@/engine/types";
 import { DEFAULT_CONFIG } from "@/engine/types";
 
 interface CompactConfig {
   y?: number;
+  cc?: string;
+  sd?: string;
+  wd?: number[];
   r?: string;
   z?: string;
   c?: number;
@@ -33,14 +30,26 @@ function fromBase64Url(str: string): string {
   return atob(padded);
 }
 
+function arraysEqual(a: readonly number[], b: readonly number[]): boolean {
+  if (a.length !== b.length) return false;
+  const sortedA = [...a].sort();
+  const sortedB = [...b].sort();
+  return sortedA.every((v, i) => v === sortedB[i]);
+}
+
 export function encodeConfig(config: AppConfig): string {
   const compact: CompactConfig = {};
 
   if (config.year !== DEFAULT_CONFIG.year) compact.y = config.year;
-  if (config.region !== DEFAULT_CONFIG.region) compact.r = config.region;
+  if (config.country !== DEFAULT_CONFIG.country) compact.cc = config.country;
+  if (config.subdivision !== DEFAULT_CONFIG.subdivision)
+    compact.sd = config.subdivision;
+  if (!arraysEqual(config.weekendDays, DEFAULT_CONFIG.weekendDays))
+    compact.wd = [...config.weekendDays];
   if (config.schoolZone !== DEFAULT_CONFIG.schoolZone)
     compact.z = config.schoolZone;
-  if (config.ptoBudget !== DEFAULT_CONFIG.ptoBudget) compact.c = config.ptoBudget;
+  if (config.ptoBudget !== DEFAULT_CONFIG.ptoBudget)
+    compact.c = config.ptoBudget;
   if (config.recoveryBudget !== DEFAULT_CONFIG.recoveryBudget)
     compact.t = config.recoveryBudget;
   if (config.strategy !== DEFAULT_CONFIG.strategy) compact.s = config.strategy;
@@ -63,9 +72,15 @@ export function decodeConfig(hash: string): AppConfig | null {
     const json = fromBase64Url(hash);
     const compact = JSON.parse(json) as CompactConfig;
 
+    const country = compact.cc ?? DEFAULT_CONFIG.country;
+    const subdivision =
+      compact.sd ?? compact.r ?? DEFAULT_CONFIG.subdivision;
+
     return {
       year: compact.y ?? DEFAULT_CONFIG.year,
-      region: (compact.r as Region) ?? DEFAULT_CONFIG.region,
+      country,
+      subdivision,
+      weekendDays: compact.wd ?? DEFAULT_CONFIG.weekendDays,
       schoolZone: (compact.z as SchoolZone) ?? DEFAULT_CONFIG.schoolZone,
       ptoBudget: compact.c ?? DEFAULT_CONFIG.ptoBudget,
       recoveryBudget: compact.t ?? DEFAULT_CONFIG.recoveryBudget,

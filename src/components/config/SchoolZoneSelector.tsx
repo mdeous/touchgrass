@@ -1,24 +1,29 @@
-import type { SchoolZone } from '@/engine/types'
-import { Label } from '@/components/ui/label'
+import type { SchoolZone } from "@/engine/types";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { useAppStore } from '@/store/app-store'
+} from "@/components/ui/select";
+import { useAppStore } from "@/store/app-store";
+import { getCountryMeta } from "@/data/country-meta";
 
 const ZONES: { value: SchoolZone; label: string }[] = [
-  { value: 'none', label: 'None' },
-  { value: 'A', label: 'Zone A' },
-  { value: 'B', label: 'Zone B' },
-  { value: 'C', label: 'Zone C' },
-]
+  { value: "none", label: "None" },
+  { value: "A", label: "Zone A" },
+  { value: "B", label: "Zone B" },
+  { value: "C", label: "Zone C" },
+];
 
 export function SchoolZoneSelector() {
-  const schoolZone = useAppStore((s) => s.schoolZone)
-  const setSchoolZone = useAppStore((s) => s.setSchoolZone)
+  const country = useAppStore((s) => s.country);
+  const schoolZone = useAppStore((s) => s.schoolZone);
+  const setSchoolZone = useAppStore((s) => s.setSchoolZone);
+
+  const meta = getCountryMeta(country);
+  if (!meta.hasSchoolZones) return null;
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -39,5 +44,5 @@ export function SchoolZoneSelector() {
         Highlights school vacation periods to help plan family-friendly breaks.
       </p>
     </div>
-  )
+  );
 }

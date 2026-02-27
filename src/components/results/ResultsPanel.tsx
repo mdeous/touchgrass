@@ -51,8 +51,9 @@ export function ResultsPanel({
         result={result}
         ptoBudget={config.ptoBudget}
         recoveryBudget={config.recoveryBudget}
+        country={config.country}
       />
-      <TimeOffSummary allocations={result.allocations} />
+      <TimeOffSummary allocations={result.allocations} country={config.country} />
       <div className="flex flex-col gap-2">
         {ponts.map((bridge) => {
           const isDisabled = disabledSet.has(bridge.pontName!);

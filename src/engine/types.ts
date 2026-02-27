@@ -1,12 +1,3 @@
-export type Region =
-  | "metropolitan"
-  | "alsace-moselle"
-  | "guadeloupe"
-  | "martinique"
-  | "guyane"
-  | "reunion"
-  | "mayotte";
-
 export type SchoolZone = "A" | "B" | "C" | "none";
 
 export type Strategy = "balanced" | "long-weekends" | "extended";
@@ -70,7 +61,9 @@ export interface OptimizationResult {
 
 export interface AppConfig {
   readonly year: number;
-  readonly region: Region;
+  readonly country: string;
+  readonly subdivision: string;
+  readonly weekendDays: readonly number[];
   readonly schoolZone: SchoolZone;
   readonly ptoBudget: number;
   readonly recoveryBudget: number;
@@ -96,7 +89,9 @@ export interface SchoolYear {
 
 export const DEFAULT_CONFIG: AppConfig = {
   year: new Date().getFullYear(),
-  region: "metropolitan",
+  country: "FR",
+  subdivision: "metropolitan",
+  weekendDays: [0, 6],
   schoolZone: "none",
   ptoBudget: 25,
   recoveryBudget: 9,

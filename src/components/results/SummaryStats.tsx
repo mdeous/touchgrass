@@ -2,6 +2,7 @@ import { CalendarDays, Palmtree, TrendingUp, BarChart3 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { OptimizationResult } from "@/engine/types";
+import { getCountryMeta } from "@/data/country-meta";
 
 interface StatItemProps {
   readonly icon: React.ReactNode;
@@ -32,13 +33,17 @@ interface SummaryStatsProps {
   readonly result: OptimizationResult;
   readonly ptoBudget: number;
   readonly recoveryBudget: number;
+  readonly country: string;
 }
 
 export function SummaryStats({
   result,
   ptoBudget,
   recoveryBudget,
+  country,
 }: SummaryStatsProps) {
+  const meta = getCountryMeta(country);
+
   return (
     <div className="flex flex-wrap gap-2">
       <StatItem
@@ -48,16 +53,18 @@ export function SummaryStats({
       />
       <StatItem
         icon={<Palmtree className="h-4 w-4" />}
-        label="PTO used"
+        label={`${meta.ptoLabel || "PTO"} used`}
         value={`${result.ptoUsed}/${ptoBudget}`}
         sub={`${ptoBudget - result.ptoUsed} remaining`}
       />
-      <StatItem
-        icon={<Palmtree className="h-4 w-4" />}
-        label="Recovery used"
-        value={`${result.recoveryUsed}/${recoveryBudget}`}
-        sub={`${recoveryBudget - result.recoveryUsed} remaining`}
-      />
+      {meta.hasRecoveryDays && (
+        <StatItem
+          icon={<Palmtree className="h-4 w-4" />}
+          label={`${meta.recoveryLabel || "Recovery"} used`}
+          value={`${result.recoveryUsed}/${recoveryBudget}`}
+          sub={`${recoveryBudget - result.recoveryUsed} remaining`}
+        />
+      )}
       <StatItem
         icon={<TrendingUp className="h-4 w-4" />}
         label="Avg efficiency"

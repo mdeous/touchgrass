@@ -24,7 +24,9 @@ export function AppShell() {
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const year = useAppStore((s) => s.year);
-  const region = useAppStore((s) => s.region);
+  const country = useAppStore((s) => s.country);
+  const subdivision = useAppStore((s) => s.subdivision);
+  const weekendDays = useAppStore((s) => s.weekendDays);
   const schoolZone = useAppStore((s) => s.schoolZone);
   const ptoBudget = useAppStore((s) => s.ptoBudget);
   const recoveryBudget = useAppStore((s) => s.recoveryBudget);
@@ -38,7 +40,9 @@ export function AppShell() {
 
   const config: AppConfig = {
     year,
-    region,
+    country,
+    subdivision,
+    weekendDays,
     schoolZone,
     ptoBudget,
     recoveryBudget,
@@ -53,7 +57,7 @@ export function AppShell() {
 
   useUrlState();
 
-  const { calendar, result, allBridges } = useOptimization(config);
+  const { calendar, result, allBridges, loading } = useOptimization(config);
 
   const ptoRemaining = config.ptoBudget - result.ptoUsed;
   const recoveryRemaining = config.recoveryBudget - result.recoveryUsed;
@@ -94,11 +98,17 @@ export function AppShell() {
 
         <div className="flex min-w-0 flex-1 flex-col gap-4">
           <CalendarLegend />
-          <CalendarGrid
-            days={calendar}
-            year={config.year}
-            onToggle={onToggle}
-          />
+          {loading ? (
+            <div className="flex items-center justify-center py-12 text-muted-foreground">
+              <p className="text-sm">Loading holidays...</p>
+            </div>
+          ) : (
+            <CalendarGrid
+              days={calendar}
+              year={config.year}
+              onToggle={onToggle}
+            />
+          )}
         </div>
 
         <aside className="w-full shrink-0 xl:w-[320px]">

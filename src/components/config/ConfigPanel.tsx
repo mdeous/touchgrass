@@ -4,9 +4,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { CountrySelector } from "@/components/config/CountrySelector";
 import { PtoBudgetInputs } from "@/components/config/PtoBudgetInputs";
-import { RegionSelector } from "@/components/config/RegionSelector";
+import { SubdivisionSelector } from "@/components/config/SubdivisionSelector";
 import { SchoolZoneSelector } from "@/components/config/SchoolZoneSelector";
+import { WeekendSelector } from "@/components/config/WeekendSelector";
 import { StrategySelector } from "@/components/config/StrategySelector";
 import { BlackoutDatePicker } from "@/components/config/BlackoutDatePicker";
 import { PreBookedPicker } from "@/components/config/PreBookedPicker";
@@ -14,51 +16,56 @@ import { CustomHolidayPicker } from "@/components/config/CustomHolidayPicker";
 
 export function ConfigPanel() {
   return (
-    <Accordion
-      type="multiple"
-      defaultValue={["leave-budget", "region-zone", "strategy"]}
-      className="w-full"
-    >
-      <AccordionItem value="leave-budget">
-        <AccordionTrigger>Leave Budget</AccordionTrigger>
-        <AccordionContent>
-          <PtoBudgetInputs />
-        </AccordionContent>
-      </AccordionItem>
+    <div className="flex flex-col gap-4">
+      <CountrySelector />
 
-      <AccordionItem value="region-zone">
-        <AccordionTrigger>Region &amp; School Zone</AccordionTrigger>
-        <AccordionContent>
-          <div className="flex flex-col gap-4">
-            <RegionSelector />
-            <SchoolZoneSelector />
-          </div>
-        </AccordionContent>
-      </AccordionItem>
+      <Accordion
+        type="multiple"
+        defaultValue={["leave-budget", "location", "strategy"]}
+        className="w-full"
+      >
+        <AccordionItem value="leave-budget">
+          <AccordionTrigger>Leave Budget</AccordionTrigger>
+          <AccordionContent>
+            <PtoBudgetInputs />
+          </AccordionContent>
+        </AccordionItem>
 
-      <AccordionItem value="strategy">
-        <AccordionTrigger>Optimization Strategy</AccordionTrigger>
-        <AccordionContent>
-          <StrategySelector />
-        </AccordionContent>
-      </AccordionItem>
+        <AccordionItem value="location">
+          <AccordionTrigger>Location</AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-col gap-4">
+              <SubdivisionSelector />
+              <SchoolZoneSelector />
+              <WeekendSelector />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
 
-      <AccordionItem value="blocked-dates">
-        <AccordionTrigger>Blocked &amp; Pre-booked Dates</AccordionTrigger>
-        <AccordionContent>
-          <div className="flex flex-col gap-4">
-            <BlackoutDatePicker />
-            <PreBookedPicker />
-          </div>
-        </AccordionContent>
-      </AccordionItem>
+        <AccordionItem value="strategy">
+          <AccordionTrigger>Optimization Strategy</AccordionTrigger>
+          <AccordionContent>
+            <StrategySelector />
+          </AccordionContent>
+        </AccordionItem>
 
-      <AccordionItem value="custom-holidays">
-        <AccordionTrigger>Custom Holidays</AccordionTrigger>
-        <AccordionContent>
-          <CustomHolidayPicker />
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+        <AccordionItem value="blocked-dates">
+          <AccordionTrigger>Blocked &amp; Pre-booked Dates</AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-col gap-4">
+              <BlackoutDatePicker />
+              <PreBookedPicker />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="custom-holidays">
+          <AccordionTrigger>Custom Holidays</AccordionTrigger>
+          <AccordionContent>
+            <CustomHolidayPicker />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </div>
   );
 }

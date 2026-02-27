@@ -5,6 +5,7 @@ import type {
   LeaveType,
   OptimizationResult,
 } from "@/engine/types";
+import type { CountryMeta } from "@/data/country-meta";
 
 function formatBridge(bridge: Bridge): string {
   const name = bridge.pontName ? `Pont: ${bridge.pontName}` : "PTO Break";
@@ -24,21 +25,32 @@ function formatBridge(bridge: Bridge): string {
 export function generateTextSummary(
   result: OptimizationResult,
   year: number,
+  meta?: CountryMeta,
 ): string {
   const header = `TouchGrass PTO Plan ${year}`;
   const separator = "=".repeat(header.length);
 
   const bridges = result.selectedBridges.map(formatBridge).join("\n\n");
 
-  const totals = [
+  const ptoLabel = meta?.ptoLabel || "PTO";
+  const lines = [
     "",
     "-".repeat(30),
     `Total days off: ${result.totalDaysOff}`,
-    `PTO used: ${result.ptoUsed}`,
-    `Recovery (RTT) used: ${result.recoveryUsed}`,
+    `${ptoLabel} used: ${result.ptoUsed}`,
+  ];
+
+  if (meta?.hasRecoveryDays && result.recoveryUsed > 0) {
+    const recoveryLabel = meta.recoveryLabel || "Recovery";
+    lines.push(`${recoveryLabel} used: ${result.recoveryUsed}`);
+  }
+
+  lines.push(
     `Average efficiency: ${Number.isInteger(result.averageEfficiency) ? result.averageEfficiency : result.averageEfficiency.toFixed(1)}:1`,
     `Number of breaks: ${result.selectedBridges.length}`,
-  ].join("\n");
+  );
+
+  const totals = lines.join("\n");
 
   return [header, separator, "", bridges, totals, ""].join("\n");
 }
@@ -116,12 +128,18 @@ export function groupAllocations(
 
 export function generateTimeOffSummary(
   allocations: readonly Allocation[],
+  meta?: CountryMeta,
 ): string {
   const groups = groupAllocations(allocations);
   if (groups.length === 0) return "";
 
   const sections = groups.map((g) => {
-    const label = g.leaveType === "pto" ? "PTO" : "Recovery (RTT)";
+    let label: string;
+    if (g.leaveType === "pto") {
+      label = meta?.ptoLabel || "PTO";
+    } else {
+      label = meta?.recoveryLabel || "Recovery";
+    }
     const header = `${label} days to request (${g.count} day${g.count !== 1 ? "s" : ""})`;
     const lines = g.lines.map((l) => `  ${l}`).join("\n");
     return `${header}\n${lines}`;

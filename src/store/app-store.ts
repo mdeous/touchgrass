@@ -2,15 +2,17 @@ import { create } from "zustand";
 import type {
   AppConfig,
   LeaveType,
-  Region,
   SchoolZone,
   Strategy,
 } from "@/engine/types";
 import { DEFAULT_CONFIG } from "@/engine/types";
+import { getCountryMeta } from "@/data/country-meta";
 
 interface AppState extends AppConfig {
   setYear: (year: number) => void;
-  setRegion: (region: Region) => void;
+  setCountry: (country: string) => void;
+  setSubdivision: (subdivision: string) => void;
+  setWeekendDays: (days: readonly number[]) => void;
   setSchoolZone: (zone: SchoolZone) => void;
   setPtoBudget: (budget: number) => void;
   setRecoveryBudget: (budget: number) => void;
@@ -31,7 +33,23 @@ export const useAppStore = create<AppState>()((set) => ({
 
   setYear: (year) => set({ year }),
 
-  setRegion: (region) => set({ region }),
+  setCountry: (country) => {
+    const meta = getCountryMeta(country);
+    set({
+      country,
+      subdivision: "default",
+      weekendDays: meta.weekendDays,
+      ptoBudget: meta.defaultPtoBudget,
+      recoveryBudget: meta.defaultRecoveryBudget,
+      schoolZone: meta.hasSchoolZones ? "none" : "none",
+      disabledBridges: [],
+      manualOverrides: {},
+    });
+  },
+
+  setSubdivision: (subdivision) => set({ subdivision }),
+
+  setWeekendDays: (weekendDays) => set({ weekendDays }),
 
   setSchoolZone: (schoolZone) => set({ schoolZone }),
 
@@ -62,13 +80,12 @@ export const useAppStore = create<AppState>()((set) => ({
     })),
 
   removePreBookedDate: (dateKey) =>
-    set((state) => {
-      const { [dateKey]: _, ...remainingTypes } = state.preBookedTypes;
-      return {
-        preBookedDates: state.preBookedDates.filter((d) => d !== dateKey),
-        preBookedTypes: remainingTypes,
-      };
-    }),
+    set((state) => ({
+      preBookedDates: state.preBookedDates.filter((d) => d !== dateKey),
+      preBookedTypes: Object.fromEntries(
+        Object.entries(state.preBookedTypes).filter(([k]) => k !== dateKey),
+      ),
+    })),
 
   addCustomHoliday: (dateKey) =>
     set((state) => ({
@@ -85,8 +102,13 @@ export const useAppStore = create<AppState>()((set) => ({
   toggleManualOverride: (dateKey, leaveType) =>
     set((state) => {
       if (leaveType === null) {
-        const { [dateKey]: _, ...remaining } = state.manualOverrides;
-        return { manualOverrides: remaining };
+        return {
+          manualOverrides: Object.fromEntries(
+            Object.entries(state.manualOverrides).filter(
+              ([k]) => k !== dateKey,
+            ),
+          ),
+        };
       }
       return {
         manualOverrides: { ...state.manualOverrides, [dateKey]: leaveType },

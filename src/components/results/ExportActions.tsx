@@ -1,46 +1,49 @@
-import { Download, Copy, Share2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { downloadIcs } from '@/export/ics-generator'
-import { generateTextSummary } from '@/export/text-summary'
-import { encodeConfig } from '@/export/url-encoder'
-import type { OptimizationResult, AppConfig } from '@/engine/types'
+import { Download, Copy, Share2 } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { downloadIcs } from "@/export/ics-generator";
+import { generateTextSummary } from "@/export/text-summary";
+import { encodeConfig } from "@/export/url-encoder";
+import type { OptimizationResult, AppConfig } from "@/engine/types";
+import { getCountryMeta } from "@/data/country-meta";
 
 interface ExportActionsProps {
-  readonly result: OptimizationResult
-  readonly config: AppConfig
+  readonly result: OptimizationResult;
+  readonly config: AppConfig;
 }
 
 export function ExportActions({ result, config }: ExportActionsProps) {
+  const meta = getCountryMeta(config.country);
+
   const handleDownloadIcs = () => {
     try {
-      downloadIcs(result, config.year)
-      toast.success('Calendar file downloaded')
+      downloadIcs(result, config.year);
+      toast.success("Calendar file downloaded");
     } catch {
-      toast.error('Failed to generate calendar file')
+      toast.error("Failed to generate calendar file");
     }
-  }
+  };
 
   const handleCopySummary = async () => {
     try {
-      const text = generateTextSummary(result, config.year)
-      await navigator.clipboard.writeText(text)
-      toast.success('Summary copied to clipboard')
+      const text = generateTextSummary(result, config.year, meta);
+      await navigator.clipboard.writeText(text);
+      toast.success("Summary copied to clipboard");
     } catch {
-      toast.error('Failed to copy summary')
+      toast.error("Failed to copy summary");
     }
-  }
+  };
 
   const handleShareLink = async () => {
     try {
-      const hash = encodeConfig(config)
-      const url = `${window.location.origin}${window.location.pathname}#${hash}`
-      await navigator.clipboard.writeText(url)
-      toast.success('Share link copied to clipboard')
+      const hash = encodeConfig(config);
+      const url = `${window.location.origin}${window.location.pathname}#${hash}`;
+      await navigator.clipboard.writeText(url);
+      toast.success("Share link copied to clipboard");
     } catch {
-      toast.error('Failed to generate share link')
+      toast.error("Failed to generate share link");
     }
-  }
+  };
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -57,5 +60,5 @@ export function ExportActions({ result, config }: ExportActionsProps) {
         Share Link
       </Button>
     </div>
-  )
+  );
 }

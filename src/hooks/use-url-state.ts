@@ -7,7 +7,9 @@ function getConfigFromStore(): AppConfig {
   const s = useAppStore.getState();
   return {
     year: s.year,
-    region: s.region,
+    country: s.country,
+    subdivision: s.subdivision,
+    weekendDays: s.weekendDays,
     schoolZone: s.schoolZone,
     ptoBudget: s.ptoBudget,
     recoveryBudget: s.recoveryBudget,
@@ -23,7 +25,9 @@ function getConfigFromStore(): AppConfig {
 
 export function useUrlState() {
   const year = useAppStore((s) => s.year);
-  const region = useAppStore((s) => s.region);
+  const country = useAppStore((s) => s.country);
+  const subdivision = useAppStore((s) => s.subdivision);
+  const weekendDays = useAppStore((s) => s.weekendDays);
   const schoolZone = useAppStore((s) => s.schoolZone);
   const ptoBudget = useAppStore((s) => s.ptoBudget);
   const recoveryBudget = useAppStore((s) => s.recoveryBudget);
@@ -47,8 +51,12 @@ export function useUrlState() {
     if (!decoded) return;
 
     const store = useAppStore.getState();
+    if (decoded.country !== "FR" || decoded.subdivision !== "metropolitan") {
+      store.setCountry(decoded.country);
+      store.setSubdivision(decoded.subdivision);
+    }
     store.setYear(decoded.year);
-    store.setRegion(decoded.region);
+    store.setWeekendDays(decoded.weekendDays);
     store.setSchoolZone(decoded.schoolZone);
     store.setPtoBudget(decoded.ptoBudget);
     store.setRecoveryBudget(decoded.recoveryBudget);
@@ -73,7 +81,9 @@ export function useUrlState() {
     };
   }, [
     year,
-    region,
+    country,
+    subdivision,
+    weekendDays,
     schoolZone,
     ptoBudget,
     recoveryBudget,

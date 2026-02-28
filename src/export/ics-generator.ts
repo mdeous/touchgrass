@@ -1,4 +1,5 @@
 import { createEvents, type EventAttributes } from "ics";
+import i18n from "@/i18n";
 import type { OptimizationResult } from "@/engine/types";
 
 function toDateArray(date: Date): [number, number, number] {
@@ -12,15 +13,21 @@ function buildEvents(
   return result.selectedBridges.map((bridge) => {
     const start = toDateArray(bridge.startDate);
     const end = toDateArray(bridge.endDate);
-    const title = bridge.pontName ? `Pont: ${bridge.pontName}` : "PTO";
-    const durationDays = bridge.totalDaysOff;
+    const displayName =
+      i18n.language === "en" ? bridge.pontName : bridge.pontNameLocal;
+    const title = displayName
+      ? i18n.t("export.pontTitle", { name: displayName })
+      : i18n.t("export.ptoTitle");
 
     return {
       title,
       start,
       end,
-      description: `${durationDays} days off (${bridge.ptoCost} PTO day${bridge.ptoCost !== 1 ? "s" : ""})`,
-      calName: `TouchGrass ${year}`,
+      description: i18n.t("export.bridgeDesc", {
+        total: bridge.totalDaysOff,
+        count: bridge.ptoCost,
+      }),
+      calName: i18n.t("export.calendarName", { year }),
     };
   });
 }

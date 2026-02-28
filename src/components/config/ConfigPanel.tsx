@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Accordion,
   AccordionContent,
@@ -15,6 +16,8 @@ import { PreBookedPicker } from "@/components/config/PreBookedPicker";
 import { CustomHolidayPicker } from "@/components/config/CustomHolidayPicker";
 
 export function ConfigPanel() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col gap-4">
       <Accordion
@@ -23,7 +26,7 @@ export function ConfigPanel() {
         className="w-full"
       >
         <AccordionItem value="location">
-          <AccordionTrigger>Location</AccordionTrigger>
+          <AccordionTrigger>{t("config.location")}</AccordionTrigger>
           <AccordionContent>
             <div className="flex flex-col gap-4">
               <CountrySelector />
@@ -35,21 +38,23 @@ export function ConfigPanel() {
         </AccordionItem>
 
         <AccordionItem value="leave-budget">
-          <AccordionTrigger>Leave Budget</AccordionTrigger>
+          <AccordionTrigger>{t("config.leaveBudget")}</AccordionTrigger>
           <AccordionContent>
             <PtoBudgetInputs />
           </AccordionContent>
         </AccordionItem>
 
         <AccordionItem value="strategy">
-          <AccordionTrigger>Optimization Strategy</AccordionTrigger>
+          <AccordionTrigger>
+            {t("config.optimizationStrategy")}
+          </AccordionTrigger>
           <AccordionContent>
             <StrategySelector />
           </AccordionContent>
         </AccordionItem>
 
         <AccordionItem value="blocked-dates">
-          <AccordionTrigger>Blocked &amp; Pre-booked Dates</AccordionTrigger>
+          <AccordionTrigger>{t("config.blockedDates")}</AccordionTrigger>
           <AccordionContent>
             <div className="flex flex-col gap-4">
               <BlackoutDatePicker />
@@ -59,7 +64,7 @@ export function ConfigPanel() {
         </AccordionItem>
 
         <AccordionItem value="custom-holidays">
-          <AccordionTrigger>Custom Holidays</AccordionTrigger>
+          <AccordionTrigger>{t("config.customHolidays")}</AccordionTrigger>
           <AccordionContent>
             <CustomHolidayPicker />
           </AccordionContent>

@@ -1,8 +1,10 @@
-import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 import { Calendar, Clock } from "lucide-react";
+import { formatShortDate } from "@/lib/format-date";
 import { Switch } from "@/components/ui/switch";
 import { EfficiencyBadge } from "@/components/results/EfficiencyBadge";
 import { useAppStore } from "@/store/app-store";
+import { useDateLocale } from "@/hooks/use-date-locale";
 import { cn } from "@/lib/utils";
 import type { Bridge } from "@/engine/types";
 
@@ -13,18 +15,14 @@ interface ClusterCardProps {
   readonly onHover?: (bridgeId: string | null) => void;
 }
 
-function dateRange(start: Date, end: Date): string {
-  const s = format(start, "MMM d");
-  const e = format(end, "MMM d");
-  return `${s} – ${e}`;
-}
-
 export function ClusterCard({
   bridge,
   disabled,
   selected,
   onHover,
 }: ClusterCardProps) {
+  const { t, i18n } = useTranslation();
+  const locale = useDateLocale();
   const toggleBridgeDisabled = useAppStore((s) => s.toggleBridgeDisabled);
 
   const handleToggle = () => {
@@ -32,6 +30,11 @@ export function ClusterCard({
       toggleBridgeDisabled(bridge.pontName);
     }
   };
+
+  const lang = i18n.language;
+  const s = formatShortDate(bridge.startDate, locale, lang);
+  const e = formatShortDate(bridge.endDate, locale, lang);
+  const dateRangeStr = `${s} – ${e}`;
 
   return (
     <div
@@ -60,25 +63,27 @@ export function ClusterCard({
               disabled && "line-through",
             )}
           >
-            {bridge.pontName ?? "Break"}
+            {(i18n.language === "en"
+              ? bridge.pontName
+              : bridge.pontNameLocal) ?? t("bridge.break")}
           </span>
           {!disabled && <EfficiencyBadge efficiency={bridge.efficiency} />}
         </div>
-        <div className="flex items-center gap-2.5 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1 whitespace-nowrap">
             <Calendar className="h-3 w-3 shrink-0" />
-            {dateRange(bridge.startDate, bridge.endDate)}
+            {dateRangeStr}
           </span>
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1 whitespace-nowrap">
             <Clock className="h-3 w-3 shrink-0" />
-            {bridge.totalDaysOff}d off
+            {t("bridge.daysOff", { count: bridge.totalDaysOff })}
           </span>
-          {!disabled && (
-            <span className="text-muted-foreground/70">
-              {bridge.ptoCost} day{bridge.ptoCost !== 1 ? "s" : ""}
-            </span>
-          )}
         </div>
+        {!disabled && (
+          <span className="text-xs text-muted-foreground/70">
+            {t("bridge.ptoCost", { count: bridge.ptoCost })}
+          </span>
+        )}
       </div>
     </div>
   );

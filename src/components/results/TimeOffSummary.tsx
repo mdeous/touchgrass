@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -20,6 +21,7 @@ interface TimeOffSummaryProps {
 }
 
 export function TimeOffSummary({ allocations, country }: TimeOffSummaryProps) {
+  const { t } = useTranslation();
   const meta = getCountryMeta(country);
   const groups = groupAllocations(allocations);
 
@@ -29,9 +31,9 @@ export function TimeOffSummary({ allocations, country }: TimeOffSummaryProps) {
     try {
       const text = generateTimeOffSummary(allocations, meta);
       await navigator.clipboard.writeText(text);
-      toast.success("Time off summary copied to clipboard");
+      toast.success(t("timeOff.copied"));
     } catch {
-      toast.error("Failed to copy summary");
+      toast.error(t("timeOff.copyFailed"));
     }
   };
 
@@ -42,7 +44,7 @@ export function TimeOffSummary({ allocations, country }: TimeOffSummaryProps) {
         className="rounded-xl border bg-card px-4"
       >
         <AccordionTrigger className="text-xs font-medium text-muted-foreground uppercase tracking-tight">
-          Time off summary
+          {t("timeOff.title")}
         </AccordionTrigger>
         <AccordionContent>
           <div className="flex flex-col gap-4">
@@ -54,8 +56,10 @@ export function TimeOffSummary({ allocations, country }: TimeOffSummaryProps) {
               return (
                 <div key={group.leaveType} className="flex flex-col gap-1">
                   <p className="text-sm font-medium text-muted-foreground">
-                    {label} days to request ({group.count} day
-                    {group.count !== 1 ? "s" : ""})
+                    {t("timeOff.daysToRequest", {
+                      label,
+                      count: group.count,
+                    })}
                   </p>
                   <div className="flex flex-col gap-0.5 pl-3">
                     {group.lines.map((line) => (
@@ -70,7 +74,7 @@ export function TimeOffSummary({ allocations, country }: TimeOffSummaryProps) {
             <div className="flex justify-end">
               <Button variant="outline" size="sm" onClick={handleCopy}>
                 <Copy className="h-3.5 w-3.5" />
-                Copy
+                {t("timeOff.copy")}
               </Button>
             </div>
           </div>

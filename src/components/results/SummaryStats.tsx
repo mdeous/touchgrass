@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { CalendarDays, Palmtree, TrendingUp } from "lucide-react";
 import type { OptimizationResult } from "@/engine/types";
 import { getCountryMeta } from "@/data/country-meta";
@@ -37,6 +38,7 @@ export function SummaryStats({
   recoveryBudget,
   country,
 }: SummaryStatsProps) {
+  const { t } = useTranslation();
   const meta = getCountryMeta(country);
   const effDisplay = Number.isInteger(result.averageEfficiency)
     ? result.averageEfficiency
@@ -46,26 +48,30 @@ export function SummaryStats({
     <div className="grid grid-cols-2 gap-x-4 gap-y-3">
       <StatItem
         icon={<CalendarDays className="h-4 w-4" />}
-        label="Total days off"
+        label={t("results.totalDaysOff")}
         value={result.totalDaysOff}
       />
       <StatItem
         icon={<TrendingUp className="h-4 w-4" />}
-        label="Avg efficiency"
+        label={t("results.avgEfficiency")}
         value={`${effDisplay}:1`}
       />
       <StatItem
         icon={<Palmtree className="h-4 w-4" />}
-        label={`${meta.ptoLabel || "PTO"} used`}
+        label={t("results.used", { label: meta.ptoLabel || "PTO" })}
         value={`${result.ptoUsed} / ${ptoBudget}`}
-        sub={`${ptoBudget - result.ptoUsed} remaining`}
+        sub={t("results.remaining", { count: ptoBudget - result.ptoUsed })}
       />
       {meta.hasRecoveryDays && (
         <StatItem
           icon={<Palmtree className="h-4 w-4" />}
-          label={`${meta.recoveryLabel || "Recovery"} used`}
+          label={t("results.used", {
+            label: meta.recoveryLabel || "Recovery",
+          })}
           value={`${result.recoveryUsed} / ${recoveryBudget}`}
-          sub={`${recoveryBudget - result.recoveryUsed} remaining`}
+          sub={t("results.remaining", {
+            count: recoveryBudget - result.recoveryUsed,
+          })}
         />
       )}
     </div>

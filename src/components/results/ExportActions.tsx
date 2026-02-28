@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Download, Copy, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -13,14 +14,15 @@ interface ExportActionsProps {
 }
 
 export function ExportActions({ result, config }: ExportActionsProps) {
+  const { t, i18n } = useTranslation();
   const meta = getCountryMeta(config.country);
 
   const handleDownloadIcs = () => {
     try {
       downloadIcs(result, config.year);
-      toast.success("Calendar file downloaded");
+      toast.success(t("export.icsDownloaded"));
     } catch {
-      toast.error("Failed to generate calendar file");
+      toast.error(t("export.icsFailed"));
     }
   };
 
@@ -28,20 +30,20 @@ export function ExportActions({ result, config }: ExportActionsProps) {
     try {
       const text = generateTextSummary(result, config.year, meta);
       await navigator.clipboard.writeText(text);
-      toast.success("Summary copied to clipboard");
+      toast.success(t("export.summaryCopied"));
     } catch {
-      toast.error("Failed to copy summary");
+      toast.error(t("export.summaryFailed"));
     }
   };
 
   const handleShareLink = async () => {
     try {
-      const hash = encodeConfig(config);
+      const hash = encodeConfig(config, i18n.language);
       const url = `${window.location.origin}${window.location.pathname}#${hash}`;
       await navigator.clipboard.writeText(url);
-      toast.success("Share link copied to clipboard");
+      toast.success(t("export.linkCopied"));
     } catch {
-      toast.error("Failed to generate share link");
+      toast.error(t("export.linkFailed"));
     }
   };
 
@@ -51,7 +53,7 @@ export function ExportActions({ result, config }: ExportActionsProps) {
         variant="ghost"
         size="icon-sm"
         onClick={handleDownloadIcs}
-        title="Download .ics"
+        title={t("export.downloadIcs")}
       >
         <Download className="h-3.5 w-3.5" />
       </Button>
@@ -59,7 +61,7 @@ export function ExportActions({ result, config }: ExportActionsProps) {
         variant="ghost"
         size="icon-sm"
         onClick={handleCopySummary}
-        title="Copy summary"
+        title={t("export.copySummary")}
       >
         <Copy className="h-3.5 w-3.5" />
       </Button>
@@ -67,7 +69,7 @@ export function ExportActions({ result, config }: ExportActionsProps) {
         variant="ghost"
         size="icon-sm"
         onClick={handleShareLink}
-        title="Share link"
+        title={t("export.shareLink")}
       >
         <Share2 className="h-3.5 w-3.5" />
       </Button>

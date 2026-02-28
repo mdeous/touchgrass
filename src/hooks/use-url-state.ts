@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import i18n from "@/i18n";
 import { encodeConfig, decodeConfig } from "@/export/url-encoder";
 import { useAppStore } from "@/store/app-store";
 import type { AppConfig } from "@/engine/types";
@@ -21,6 +22,12 @@ function getConfigFromStore(): AppConfig {
     manualOverrides: s.manualOverrides,
     disabledBridges: s.disabledBridges,
   };
+}
+
+function writeHash() {
+  const config = getConfigFromStore();
+  const hash = encodeConfig(config, i18n.language);
+  window.history.replaceState(null, "", `#${hash}`);
 }
 
 export function useUrlState() {
@@ -50,17 +57,32 @@ export function useUrlState() {
     const decoded = decodeConfig(hash);
     if (!decoded) return;
 
-    const store = useAppStore.getState();
-    if (decoded.country !== "FR" || decoded.subdivision !== "metropolitan") {
-      store.setCountry(decoded.country);
-      store.setSubdivision(decoded.subdivision);
+    const { config: cfg, language } = decoded;
+
+    if (language) {
+      i18n.changeLanguage(language);
     }
-    store.setYear(decoded.year);
-    store.setWeekendDays(decoded.weekendDays);
-    store.setSchoolZone(decoded.schoolZone);
-    store.setPtoBudget(decoded.ptoBudget);
-    store.setRecoveryBudget(decoded.recoveryBudget);
-    store.setStrategy(decoded.strategy);
+
+    const store = useAppStore.getState();
+    if (cfg.country !== "FR" || cfg.subdivision !== "metropolitan") {
+      store.setCountry(cfg.country);
+      store.setSubdivision(cfg.subdivision);
+    }
+    store.setYear(cfg.year);
+    store.setWeekendDays(cfg.weekendDays);
+    store.setSchoolZone(cfg.schoolZone);
+    store.setPtoBudget(cfg.ptoBudget);
+    store.setRecoveryBudget(cfg.recoveryBudget);
+    store.setStrategy(cfg.strategy);
+  }, []);
+
+  // Re-encode hash on language change
+  useEffect(() => {
+    const handler = () => writeHash();
+    i18n.on("languageChanged", handler);
+    return () => {
+      i18n.off("languageChanged", handler);
+    };
   }, []);
 
   useEffect(() => {
@@ -69,9 +91,7 @@ export function useUrlState() {
     }
 
     debounceRef.current = setTimeout(() => {
-      const config = getConfigFromStore();
-      const hash = encodeConfig(config);
-      window.history.replaceState(null, "", `#${hash}`);
+      writeHash();
     }, 300);
 
     return () => {

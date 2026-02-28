@@ -1,4 +1,9 @@
-import type { AppConfig, SchoolZone, Strategy, LeaveType } from "@/engine/types";
+import type {
+  AppConfig,
+  SchoolZone,
+  Strategy,
+  LeaveType,
+} from "@/engine/types";
 import { DEFAULT_CONFIG } from "@/engine/types";
 
 interface CompactConfig {
@@ -17,6 +22,7 @@ interface CompactConfig {
   ch?: string[];
   mo?: Record<string, string | null>;
   db?: string[];
+  l?: string;
 }
 
 function toBase64Url(str: string): string {
@@ -37,7 +43,7 @@ function arraysEqual(a: readonly number[], b: readonly number[]): boolean {
   return sortedA.every((v, i) => v === sortedB[i]);
 }
 
-export function encodeConfig(config: AppConfig): string {
+export function encodeConfig(config: AppConfig, language?: string): string {
   const compact: CompactConfig = {};
 
   if (config.year !== DEFAULT_CONFIG.year) compact.y = config.year;
@@ -63,34 +69,42 @@ export function encodeConfig(config: AppConfig): string {
   }
   if (config.disabledBridges.length > 0)
     compact.db = [...config.disabledBridges];
+  if (language && language !== "en") compact.l = language;
 
   return toBase64Url(JSON.stringify(compact));
 }
 
-export function decodeConfig(hash: string): AppConfig | null {
+export interface DecodedUrl {
+  readonly config: AppConfig;
+  readonly language?: string;
+}
+
+export function decodeConfig(hash: string): DecodedUrl | null {
   try {
     const json = fromBase64Url(hash);
     const compact = JSON.parse(json) as CompactConfig;
 
     const country = compact.cc ?? DEFAULT_CONFIG.country;
-    const subdivision =
-      compact.sd ?? compact.r ?? DEFAULT_CONFIG.subdivision;
+    const subdivision = compact.sd ?? compact.r ?? DEFAULT_CONFIG.subdivision;
 
     return {
-      year: compact.y ?? DEFAULT_CONFIG.year,
-      country,
-      subdivision,
-      weekendDays: compact.wd ?? DEFAULT_CONFIG.weekendDays,
-      schoolZone: (compact.z as SchoolZone) ?? DEFAULT_CONFIG.schoolZone,
-      ptoBudget: compact.c ?? DEFAULT_CONFIG.ptoBudget,
-      recoveryBudget: compact.t ?? DEFAULT_CONFIG.recoveryBudget,
-      strategy: (compact.s as Strategy) ?? DEFAULT_CONFIG.strategy,
-      blackoutDates: compact.b ?? [],
-      preBookedDates: compact.p ?? [],
-      preBookedTypes: (compact.pt as Record<string, LeaveType>) ?? {},
-      customHolidays: compact.ch ?? [],
-      manualOverrides: (compact.mo as Record<string, LeaveType | null>) ?? {},
-      disabledBridges: compact.db ?? [],
+      config: {
+        year: compact.y ?? DEFAULT_CONFIG.year,
+        country,
+        subdivision,
+        weekendDays: compact.wd ?? DEFAULT_CONFIG.weekendDays,
+        schoolZone: (compact.z as SchoolZone) ?? DEFAULT_CONFIG.schoolZone,
+        ptoBudget: compact.c ?? DEFAULT_CONFIG.ptoBudget,
+        recoveryBudget: compact.t ?? DEFAULT_CONFIG.recoveryBudget,
+        strategy: (compact.s as Strategy) ?? DEFAULT_CONFIG.strategy,
+        blackoutDates: compact.b ?? [],
+        preBookedDates: compact.p ?? [],
+        preBookedTypes: (compact.pt as Record<string, LeaveType>) ?? {},
+        customHolidays: compact.ch ?? [],
+        manualOverrides: (compact.mo as Record<string, LeaveType | null>) ?? {},
+        disabledBridges: compact.db ?? [],
+      },
+      language: compact.l,
     };
   } catch {
     return null;

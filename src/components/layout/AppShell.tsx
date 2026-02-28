@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Settings } from "lucide-react";
 import { Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import { ReloadPrompt } from "@/components/pwa/ReloadPrompt";
 import type { AppConfig } from "@/engine/types";
 
 export function AppShell() {
+  const { t } = useTranslation();
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const year = useAppStore((s) => s.year);
@@ -79,12 +81,12 @@ export function AppShell() {
             <SheetTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2">
                 <Settings className="size-4" />
-                Configuration
+                {t("app.configuration")}
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-80 overflow-y-auto p-0">
               <SheetHeader className="px-4 pt-4">
-                <SheetTitle>Configuration</SheetTitle>
+                <SheetTitle>{t("app.configuration")}</SheetTitle>
               </SheetHeader>
               <div className="px-4 pb-4">
                 <ConfigPanel />
@@ -100,7 +102,7 @@ export function AppShell() {
         <div className="flex min-w-0 flex-1 flex-col gap-4">
           {loading ? (
             <div className="flex items-center justify-center py-12 text-muted-foreground">
-              <p className="text-sm">Loading holidays...</p>
+              <p className="text-sm">{t("app.loadingHolidays")}</p>
             </div>
           ) : (
             <CalendarGrid

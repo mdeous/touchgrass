@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { SchoolZone } from "@/engine/types";
 import { Label } from "@/components/ui/label";
 import {
@@ -10,14 +11,8 @@ import {
 import { useAppStore } from "@/store/app-store";
 import { getCountryMeta } from "@/data/country-meta";
 
-const ZONES: { value: SchoolZone; label: string }[] = [
-  { value: "none", label: "None" },
-  { value: "A", label: "Zone A" },
-  { value: "B", label: "Zone B" },
-  { value: "C", label: "Zone C" },
-];
-
 export function SchoolZoneSelector() {
+  const { t } = useTranslation();
   const country = useAppStore((s) => s.country);
   const schoolZone = useAppStore((s) => s.schoolZone);
   const setSchoolZone = useAppStore((s) => s.setSchoolZone);
@@ -25,15 +20,22 @@ export function SchoolZoneSelector() {
   const meta = getCountryMeta(country);
   if (!meta.hasSchoolZones) return null;
 
+  const zones: { value: SchoolZone; label: string }[] = [
+    { value: "none", label: t("zone.none") },
+    { value: "A", label: t("zone.A") },
+    { value: "B", label: t("zone.B") },
+    { value: "C", label: t("zone.C") },
+  ];
+
   return (
     <div className="flex flex-col gap-1.5">
-      <Label htmlFor="zone-select">School Zone</Label>
+      <Label htmlFor="zone-select">{t("config.schoolZone")}</Label>
       <Select value={schoolZone} onValueChange={setSchoolZone}>
         <SelectTrigger id="zone-select" className="w-full">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {ZONES.map((z) => (
+          {zones.map((z) => (
             <SelectItem key={z.value} value={z.value}>
               {z.label}
             </SelectItem>
@@ -41,7 +43,7 @@ export function SchoolZoneSelector() {
         </SelectContent>
       </Select>
       <p className="text-xs text-muted-foreground">
-        Highlights school vacation periods to help plan family-friendly breaks.
+        {t("config.schoolZoneHelper")}
       </p>
     </div>
   );

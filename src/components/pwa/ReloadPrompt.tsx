@@ -1,10 +1,12 @@
 import { useRegisterSW } from "virtual:pwa-register/react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useEffect } from "react";
 
 const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000;
 
 export function ReloadPrompt() {
+  const { t } = useTranslation();
   const {
     offlineReady: [offlineReady, setOfflineReady],
     needRefresh: [needRefresh, setNeedRefresh],
@@ -20,17 +22,17 @@ export function ReloadPrompt() {
 
   useEffect(() => {
     if (offlineReady) {
-      toast.success("App ready to work offline");
+      toast.success(t("pwa.offlineReady"));
       setOfflineReady(false);
     }
-  }, [offlineReady, setOfflineReady]);
+  }, [offlineReady, setOfflineReady, t]);
 
   useEffect(() => {
     if (needRefresh) {
-      toast("New version available", {
+      toast(t("pwa.newVersion"), {
         duration: Infinity,
         action: {
-          label: "Reload",
+          label: t("pwa.reload"),
           onClick: () => {
             updateServiceWorker(true);
             setNeedRefresh(false);
@@ -38,7 +40,7 @@ export function ReloadPrompt() {
         },
       });
     }
-  }, [needRefresh, setNeedRefresh, updateServiceWorker]);
+  }, [needRefresh, setNeedRefresh, updateServiceWorker, t]);
 
   return null;
 }

@@ -40,6 +40,7 @@ export interface Bridge {
   readonly efficiency: number;
   readonly adjacentHolidays: readonly string[];
   readonly pontName: string | null;
+  readonly pontNameLocal: string | null;
   readonly startDate: Date;
   readonly endDate: Date;
   readonly weightedScore: number;

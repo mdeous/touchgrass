@@ -12,6 +12,7 @@ function makeBridge(overrides: Partial<Bridge> = {}): Bridge {
     efficiency: 1,
     adjacentHolidays: ["Ascension"],
     pontName: "Pont de l'Ascension",
+    pontNameLocal: "Ascension",
     startDate: new Date(2026, 4, 14),
     endDate: new Date(2026, 4, 17),
     weightedScore: 0,

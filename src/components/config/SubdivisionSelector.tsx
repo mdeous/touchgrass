@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -12,6 +13,7 @@ import { getCountryMeta } from "@/data/country-meta";
 import { loadSubdivisions } from "@/data/holiday-loader";
 
 export function SubdivisionSelector() {
+  const { t } = useTranslation();
   const country = useAppStore((s) => s.country);
   const subdivision = useAppStore((s) => s.subdivision);
   const setSubdivision = useAppStore((s) => s.setSubdivision);
@@ -57,7 +59,7 @@ export function SubdivisionSelector() {
         <Label htmlFor={selectId}>{meta.subdivisionLabel}</Label>
         <Select disabled>
           <SelectTrigger id={selectId} className="w-full">
-            <SelectValue placeholder="Loading..." />
+            <SelectValue placeholder={t("config.loading")} />
           </SelectTrigger>
           <SelectContent />
         </Select>
@@ -71,7 +73,9 @@ export function SubdivisionSelector() {
       <Select value={subdivision} onValueChange={setSubdivision}>
         <SelectTrigger id={selectId} className="w-full">
           <SelectValue
-            placeholder={`Select ${meta.subdivisionLabel.toLowerCase()}`}
+            placeholder={t("config.selectSubdivision", {
+              label: meta.subdivisionLabel.toLowerCase(),
+            })}
           />
         </SelectTrigger>
         <SelectContent>

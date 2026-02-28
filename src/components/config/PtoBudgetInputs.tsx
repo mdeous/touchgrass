@@ -1,9 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAppStore } from "@/store/app-store";
 import { getCountryMeta } from "@/data/country-meta";
 
 export function PtoBudgetInputs() {
+  const { t } = useTranslation();
   const country = useAppStore((s) => s.country);
   const ptoBudget = useAppStore((s) => s.ptoBudget);
   const recoveryBudget = useAppStore((s) => s.recoveryBudget);
@@ -15,7 +17,7 @@ export function PtoBudgetInputs() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="pto-budget">Paid Time Off</Label>
+        <Label htmlFor="pto-budget">{t("config.paidTimeOff")}</Label>
         <Input
           id="pto-budget"
           type="number"
@@ -28,13 +30,13 @@ export function PtoBudgetInputs() {
           }}
         />
         <p className="text-xs text-muted-foreground">
-          Paid vacation days available (default {meta.defaultPtoBudget})
+          {t("config.ptoHelper", { count: meta.defaultPtoBudget })}
         </p>
       </div>
 
       {meta.hasRecoveryDays && (
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="recovery-budget">Recovery Days</Label>
+          <Label htmlFor="recovery-budget">{t("config.recoveryDays")}</Label>
           <Input
             id="recovery-budget"
             type="number"
@@ -50,7 +52,7 @@ export function PtoBudgetInputs() {
             }}
           />
           <p className="text-xs text-muted-foreground">
-            Recovery days available (default {meta.defaultRecoveryBudget})
+            {t("config.recoveryHelper", { count: meta.defaultRecoveryBudget })}
           </p>
         </div>
       )}

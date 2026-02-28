@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { SummaryStats } from "@/components/results/SummaryStats";
 import { TimeOffSummary } from "@/components/results/TimeOffSummary";
 import { ClusterCard } from "@/components/results/ClusterCard";
@@ -28,6 +29,7 @@ export function ResultsPanel({
   allBridges,
   onBridgeHover,
 }: ResultsPanelProps) {
+  const { t } = useTranslation();
   const ponts = getUniquePonts(allBridges);
   const disabledSet = new Set(config.disabledBridges);
   const selectedSet = new Set(result.selectedBridges.map((b) => b.pontName));
@@ -35,8 +37,8 @@ export function ResultsPanel({
   if (ponts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-12 text-muted-foreground">
-        <p className="text-sm">No optimization results yet.</p>
-        <p className="text-xs">Configure your PTO budget to get started.</p>
+        <p className="text-sm">{t("results.noResults")}</p>
+        <p className="text-xs">{t("results.getStarted")}</p>
       </div>
     );
   }
@@ -47,7 +49,7 @@ export function ResultsPanel({
       <div className="rounded-xl border bg-card p-4">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold tracking-tight text-muted-foreground uppercase">
-            Results
+            {t("results.title")}
           </h2>
           <ExportActions result={result} config={config} />
         </div>
@@ -68,7 +70,9 @@ export function ResultsPanel({
       {/* Bridge list */}
       <div className="rounded-xl border bg-card p-2">
         <p className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-tight">
-          Bridges ({result.selectedBridges.length} selected)
+          {t("results.bridgesSelected", {
+            count: result.selectedBridges.length,
+          })}
         </p>
         <div className="flex flex-col">
           {ponts.map((bridge) => {

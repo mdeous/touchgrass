@@ -1,4 +1,7 @@
 import { format, differenceInCalendarDays } from "date-fns";
+import i18n from "@/i18n";
+import { getDateLocale } from "@/i18n/get-date-locale";
+import { formatShortDate, formatFullDate } from "@/lib/format-date";
 import type {
   Allocation,
   Bridge,
@@ -8,9 +11,15 @@ import type {
 import type { CountryMeta } from "@/data/country-meta";
 
 function formatBridge(bridge: Bridge): string {
-  const name = bridge.pontName ? `Pont: ${bridge.pontName}` : "PTO Break";
-  const start = format(bridge.startDate, "MMM d");
-  const end = format(bridge.endDate, "MMM d, yyyy");
+  const locale = getDateLocale();
+  const displayName =
+    i18n.language === "en" ? bridge.pontName : bridge.pontNameLocal;
+  const name = displayName
+    ? i18n.t("export.pontTitle", { name: displayName })
+    : i18n.t("export.ptoBreak");
+  const lang = i18n.language;
+  const start = formatShortDate(bridge.startDate, locale, lang);
+  const end = formatFullDate(bridge.endDate, locale, lang);
   const eff = Number.isInteger(bridge.efficiency)
     ? String(bridge.efficiency)
     : bridge.efficiency.toFixed(1);
@@ -18,7 +27,7 @@ function formatBridge(bridge: Bridge): string {
   return [
     `${name}`,
     `  ${start} - ${end}`,
-    `  ${bridge.totalDaysOff} days off, ${bridge.ptoCost} PTO day${bridge.ptoCost !== 1 ? "s" : ""} (${eff}:1 efficiency)`,
+    `  ${i18n.t("export.daysOff", { count: bridge.totalDaysOff })}, ${i18n.t("export.ptoDays", { count: bridge.ptoCost })} (${i18n.t("export.efficiency", { value: eff })})`,
   ].join("\n");
 }
 
@@ -27,7 +36,7 @@ export function generateTextSummary(
   year: number,
   meta?: CountryMeta,
 ): string {
-  const header = `TouchGrass PTO Plan ${year}`;
+  const header = i18n.t("export.planHeader", { year });
   const separator = "=".repeat(header.length);
 
   const bridges = result.selectedBridges.map(formatBridge).join("\n\n");
@@ -36,18 +45,26 @@ export function generateTextSummary(
   const lines = [
     "",
     "-".repeat(30),
-    `Total days off: ${result.totalDaysOff}`,
-    `${ptoLabel} used: ${result.ptoUsed}`,
+    i18n.t("export.totalDaysOff", { count: result.totalDaysOff }),
+    i18n.t("export.labelUsed", { label: ptoLabel, count: result.ptoUsed }),
   ];
 
   if (meta?.hasRecoveryDays && result.recoveryUsed > 0) {
     const recoveryLabel = meta.recoveryLabel || "Recovery";
-    lines.push(`${recoveryLabel} used: ${result.recoveryUsed}`);
+    lines.push(
+      i18n.t("export.labelUsed", {
+        label: recoveryLabel,
+        count: result.recoveryUsed,
+      }),
+    );
   }
 
+  const effValue = Number.isInteger(result.averageEfficiency)
+    ? result.averageEfficiency
+    : result.averageEfficiency.toFixed(1);
   lines.push(
-    `Average efficiency: ${Number.isInteger(result.averageEfficiency) ? result.averageEfficiency : result.averageEfficiency.toFixed(1)}:1`,
-    `Number of breaks: ${result.selectedBridges.length}`,
+    i18n.t("export.avgEfficiency", { value: effValue }),
+    i18n.t("export.numBreaks", { count: result.selectedBridges.length }),
   );
 
   const totals = lines.join("\n");
@@ -84,16 +101,21 @@ function collapseToRanges(dates: readonly Date[]): readonly DateRange[] {
 }
 
 function formatRange(range: DateRange): string {
+  const locale = getDateLocale();
+  const lang = i18n.language;
   if (range.start.getTime() === range.end.getTime()) {
-    return format(range.start, "MMM d");
+    return formatShortDate(range.start, locale, lang);
   }
-  if (
+  const sameMonth =
     range.start.getMonth() === range.end.getMonth() &&
-    range.start.getFullYear() === range.end.getFullYear()
-  ) {
-    return `${format(range.start, "MMM d")}-${format(range.end, "d")}`;
+    range.start.getFullYear() === range.end.getFullYear();
+  if (sameMonth) {
+    if (lang === "fr") {
+      return `${format(range.start, "d", { locale })}-${formatShortDate(range.end, locale, lang)}`;
+    }
+    return `${formatShortDate(range.start, locale, lang)}-${format(range.end, "d", { locale })}`;
   }
-  return `${format(range.start, "MMM d")} - ${format(range.end, "MMM d")}`;
+  return `${formatShortDate(range.start, locale, lang)} - ${formatShortDate(range.end, locale, lang)}`;
 }
 
 export interface TimeOffGroup {
@@ -140,7 +162,10 @@ export function generateTimeOffSummary(
     } else {
       label = meta?.recoveryLabel || "Recovery";
     }
-    const header = `${label} days to request (${g.count} day${g.count !== 1 ? "s" : ""})`;
+    const header = i18n.t("timeOff.daysToRequest", {
+      label,
+      count: g.count,
+    });
     const lines = g.lines.map((l) => `  ${l}`).join("\n");
     return `${header}\n${lines}`;
   });

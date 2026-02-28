@@ -1,20 +1,22 @@
+import { useTranslation } from "react-i18next";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/app-store";
 
-const DAYS: { index: number; label: string }[] = [
-  { index: 1, label: "M" },
-  { index: 2, label: "T" },
-  { index: 3, label: "W" },
-  { index: 4, label: "T" },
-  { index: 5, label: "F" },
-  { index: 6, label: "S" },
-  { index: 0, label: "S" },
-];
-
 export function WeekendSelector() {
+  const { t } = useTranslation();
   const weekendDays = useAppStore((s) => s.weekendDays);
   const setWeekendDays = useAppStore((s) => s.setWeekendDays);
+
+  const days = [
+    { index: 1, label: t("day.mon") },
+    { index: 2, label: t("day.tue") },
+    { index: 3, label: t("day.wed") },
+    { index: 4, label: t("day.thu") },
+    { index: 5, label: t("day.fri") },
+    { index: 6, label: t("day.sat") },
+    { index: 0, label: t("day.sun") },
+  ];
 
   const toggle = (day: number) => {
     const next = weekendDays.includes(day)
@@ -25,9 +27,9 @@ export function WeekendSelector() {
 
   return (
     <div className="flex flex-col gap-1.5">
-      <Label>Weekend Days</Label>
+      <Label>{t("config.weekendDays")}</Label>
       <div className="grid grid-cols-7 gap-1">
-        {DAYS.map(({ index, label }) => (
+        {days.map(({ index, label }) => (
           <button
             key={index}
             type="button"
@@ -43,7 +45,9 @@ export function WeekendSelector() {
           </button>
         ))}
       </div>
-      <p className="text-xs text-muted-foreground">Days off each week</p>
+      <p className="text-xs text-muted-foreground">
+        {t("config.weekendHelper")}
+      </p>
     </div>
   );
 }

@@ -13,10 +13,11 @@ function isOffDay(day: DayInfo): boolean {
 function findAdjacentHolidays(
   gap: DayInfo[],
   calendarMap: Map<string, DayInfo>,
-): string[] {
-  const holidays: string[] = [];
+): { namesEn: string[]; namesLocal: string[] } {
+  const namesEn: string[] = [];
+  const namesLocal: string[] = [];
 
-  if (gap.length === 0) return holidays;
+  if (gap.length === 0) return { namesEn, namesLocal };
 
   const firstGapDate = gap[0].date;
   const lastGapDate = gap[gap.length - 1].date;
@@ -27,7 +28,8 @@ function findAdjacentHolidays(
     const day = calendarMap.get(key);
     if (!day || (!day.isWeekend && day.type !== "holiday")) break;
     if (day.holiday) {
-      holidays.push(day.holiday.nameEn);
+      namesEn.push(day.holiday.nameEn);
+      namesLocal.push(day.holiday.name);
     }
     checkBefore = addDays(checkBefore, -1);
   }
@@ -38,12 +40,13 @@ function findAdjacentHolidays(
     const day = calendarMap.get(key);
     if (!day || (!day.isWeekend && day.type !== "holiday")) break;
     if (day.holiday) {
-      holidays.push(day.holiday.nameEn);
+      namesEn.push(day.holiday.nameEn);
+      namesLocal.push(day.holiday.name);
     }
     checkAfter = addDays(checkAfter, 1);
   }
 
-  return holidays;
+  return { namesEn, namesLocal };
 }
 
 function findClusterBounds(
@@ -135,7 +138,10 @@ export function findBridges(calendar: DayInfo[], today?: Date): Bridge[] {
         const hasAfter = afterGap && isOffDay(afterGap);
 
         if (hasBefore || hasAfter) {
-          const adjacentHolidays = findAdjacentHolidays(gapDays, calendarMap);
+          const { namesEn, namesLocal } = findAdjacentHolidays(
+            gapDays,
+            calendarMap,
+          );
           const cluster = findClusterBounds(gapDays, calendarMap);
           const ptoCost = gapDays.length;
           const gainedDays = cluster.totalDaysOff - ptoCost;
@@ -148,8 +154,9 @@ export function findBridges(calendar: DayInfo[], today?: Date): Bridge[] {
             totalDaysOff: cluster.totalDaysOff,
             gainedDays,
             efficiency,
-            adjacentHolidays,
-            pontName: buildPontName(adjacentHolidays),
+            adjacentHolidays: namesEn,
+            pontName: buildPontName(namesEn),
+            pontNameLocal: buildPontName(namesLocal),
             startDate: cluster.start,
             endDate: cluster.end,
             weightedScore: 0,

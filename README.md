@@ -1,73 +1,98 @@
-# React + TypeScript + Vite
+# 🌿 TouchGrass
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Maximize your time off. Touch grass more often.**
 
-Currently, two official plugins are available:
+🗓️ Time-off optimizer · 🌍 30 countries · 🔗 Shareable links · 📱 PWA · 🇬🇧🇫🇷 EN/FR
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[**Try it live →**](https://mdeous.github.io/touchgrass/)
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Features
+>
+- 🧠 **Smart optimization** — Finds bridge days between holidays and weekends, then allocates your leave budget for maximum consecutive days off
+- 🌍 **30 countries** — Public holidays, regional subdivisions, and country-specific leave types out of the box
+- 📊 **3 strategies** — Balanced, Long Weekends, or Extended Vacations depending on your style
+- 🚫 **Blackout dates** — Mark days you can't take off; the optimizer works around them
+- 📌 **Pre-booked leave** — Already have days planned? Include them so the optimizer accounts for your existing schedule
+- 🏖️ **Custom holidays** — Add company days off or personal holidays
+- 📅 **ICS export** — Download optimized leave as a calendar file
+- 🔗 **Shareable URL** — Share your full configuration via a single link
+- 📋 **Text summary** — Copy a plain-text summary of your results
+- 🌙 **Dark mode** — Automatic or manual theme switching
+- 📱 **Installable PWA** — Works offline as a native-feeling app
 
-## Expanding the ESLint configuration
+## 🌍 Supported Countries
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+🇦🇪 UAE · 🇦🇹 Austria · 🇦🇺 Australia · 🇧🇪 Belgium · 🇧🇷 Brazil · 🇨🇦 Canada · 🇨🇭 Switzerland · 🇨🇿 Czech Republic · 🇩🇪 Germany · 🇩🇰 Denmark · 🇪🇸 Spain · 🇫🇮 Finland · 🇫🇷 France · 🇬🇧 United Kingdom · 🇬🇷 Greece · 🇮🇪 Ireland · 🇮🇳 India · 🇮🇹 Italy · 🇯🇵 Japan · 🇱🇺 Luxembourg · 🇲🇽 Mexico · 🇳🇱 Netherlands · 🇳🇴 Norway · 🇳🇿 New Zealand · 🇵🇱 Poland · 🇵🇹 Portugal · 🇸🇦 Saudi Arabia · 🇸🇪 Sweden · 🇸🇬 Singapore · 🇺🇸 United States
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🧩 How It Works
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **Build a calendar** — Each day of the year is tagged as a workday, weekend, or holiday based on your country and region
+2. **Find bridges** — The engine scans for workday gaps (1–4 days) between off-days that can be "bridged" with leave
+3. **Score & rank** — Bridges are scored by efficiency (days off gained per leave day spent), weighted by your chosen strategy
+4. **Optimize** — A greedy algorithm selects the best bridges within your leave budget, respecting blackouts and pre-booked days
+5. **Allocate** — Each selected bridge day is assigned as PTO or Recovery, preferring recovery days for single-day bridges
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+**Efficiency example:** Taking 1 PTO day on a Friday between a Thursday holiday and the weekend gives you 4 consecutive days off — that's 4× efficiency.
+
+## 🛠️ Tech Stack
+
+| Layer     | Technologies                           |
+| --------- | -------------------------------------- |
+| Framework | React 19, TypeScript, Vite 7           |
+| Styling   | Tailwind CSS 4, Radix UI, Lucide icons |
+| State     | Zustand 5, URL hash sync               |
+| i18n      | i18next (English, French)              |
+| Testing   | Vitest, Testing Library, jsdom         |
+| Export    | ICS generation, base64url sharing      |
+
+## 🚀 Getting Started
+
+```bash
+git clone https://github.com/mdeous/touchgrass.git
+cd touchgrass
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+| Command            | Description                   |
+| ------------------ | ----------------------------- |
+| `npm run dev`      | Start dev server              |
+| `npm run build`    | Type-check + production build |
+| `npm run lint`     | Run ESLint                    |
+| `npm run test`     | Run tests in watch mode       |
+| `npm run test:run` | Single test run               |
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🏗️ Architecture
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+The core is a **pure-function pipeline** with no side effects:
+
+```text
+buildCalendar → findBridges → scoreBridges → optimize → allocate
 ```
+
+```text
+src/
+├── engine/          # Pure optimization pipeline
+│   ├── calendar-utils.ts   # Day tagging (workday/weekend/holiday)
+│   ├── bridge-finder.ts    # Gap detection between off-days
+│   ├── scorer.ts           # Strategy-weighted scoring
+│   ├── optimizer.ts        # Greedy bridge selection
+│   ├── allocator.ts        # PTO vs Recovery assignment
+│   └── types.ts            # Shared types
+├── data/            # Holidays, regions, country metadata
+├── store/           # Zustand state management
+├── hooks/           # React hooks (optimization, URL sync)
+├── components/      # UI (config, calendar, results)
+├── i18n/            # Translations (EN, FR)
+└── export/          # ICS, text summary, URL encoding
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
+
+## 📄 License
+
+MIT

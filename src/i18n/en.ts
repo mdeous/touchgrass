@@ -67,7 +67,7 @@ const en = {
   "config.pto": "PTO",
   "config.rtt": "RTT",
   "config.preBookedHelper":
-    "Days already booked off — the optimizer will work around them.",
+    "Days already booked off — not counted against your leave budget. The optimizer will work around them.",
 
   // Custom holidays
   "config.customHolidaysHelper":

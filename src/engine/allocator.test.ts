@@ -107,7 +107,7 @@ describe("allocate", () => {
     expect(preBookedAlloc!.leaveType).toBe("pto");
   });
 
-  it("deducts pre-booked from budgets", () => {
+  it("does not deduct pre-booked from budgets", () => {
     const preBooked: Record<string, LeaveType> = {
       "2026-03-16": "recovery",
     };
@@ -118,7 +118,8 @@ describe("allocate", () => {
     const bridgeAlloc = allocations.find(
       (a) => a.date.getMonth() === 4 && a.date.getDate() === 15,
     );
-    expect(bridgeAlloc).toBeUndefined();
+    expect(bridgeAlloc).toBeDefined();
+    expect(bridgeAlloc!.leaveType).toBe("recovery");
   });
 
   it("returns empty array when no bridges selected", () => {

@@ -17,9 +17,7 @@ export function optimize(
   const preBookedSet = new Set(preBookedDates);
   const disabledSet = new Set(disabledBridges);
 
-  const preBookedCost = preBookedDates.length;
-
-  let remainingBudget = ptoBudget + recoveryBudget - preBookedCost;
+  let remainingBudget = ptoBudget + recoveryBudget;
   const usedDates = new Set<string>();
   const selected: Bridge[] = [];
 

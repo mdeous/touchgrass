@@ -95,7 +95,7 @@ describe("optimize", () => {
     expect(selected[0].id).toBe("high");
   });
 
-  it("subtracts pre-booked dates from budget", () => {
+  it("does not subtract pre-booked dates from budget", () => {
     const bridges = [
       makeBridge({
         id: "a",
@@ -105,7 +105,7 @@ describe("optimize", () => {
       }),
     ];
     const selected = optimize(bridges, 1, 0, [], ["2026-03-15"]);
-    expect(selected).toHaveLength(0);
+    expect(selected).toHaveLength(1);
   });
 
   it("returns empty array when budget is zero", () => {

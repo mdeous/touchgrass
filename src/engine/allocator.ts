@@ -10,12 +10,6 @@ export function allocate(
   let ptoRemaining = ptoBudget;
   let recoveryRemaining = recoveryBudget;
 
-  for (const dateKey of Object.keys(preBookedTypes)) {
-    const type = preBookedTypes[dateKey];
-    if (type === "pto") ptoRemaining--;
-    else recoveryRemaining--;
-  }
-
   const preBookedAllocations: Allocation[] = Object.entries(preBookedTypes).map(
     ([dateKey, leaveType]) => {
       const [y, m, d] = dateKey.split("-").map(Number);

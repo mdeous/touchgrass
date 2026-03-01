@@ -68,7 +68,7 @@ const fr = {
   "config.pto": "CP",
   "config.rtt": "RTT",
   "config.preBookedHelper":
-    "Jours déjà posés — non décomptés de votre budget de congés. L'optimiseur les prendra en compte.",
+    "Jours déjà posés — l'optimiseur les prendra en compte.",
 
   // Custom holidays
   "config.customHolidaysHelper":

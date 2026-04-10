@@ -22,7 +22,7 @@
 
 ## :earth_africa: Supported Countries
 
-:united_arab_emirates: UAE · :austria: Austria · :australia: Australia · :belgium: Belgium · :brazil: Brazil · :canada: Canada · :switzerland: Switzerland · :czech_republic: Czech Republic · :de: Germany · :denmark: Denmark · :es: Spain · :finland: Finland · :fr: France · :gb: United Kingdom · :greece: Greece · :ireland: Ireland · :india: India · :it: Italy · :jp: Japan · :luxembourg: Luxembourg · :mexico: Mexico · :netherlands: Netherlands · :norway: Norway · :new_zealand: New Zealand · :poland: Poland · :portugal: Portugal · :saudi_arabia: Saudi Arabia · :sweden: Sweden · :singapore: Singapore · :us: United States
+:austria: Austria · :australia: Australia · :belgium: Belgium · :brazil: Brazil · :canada: Canada · :switzerland: Switzerland · :czech_republic: Czech Republic · :de: Germany · :denmark: Denmark · :es: Spain · :finland: Finland · :fr: France · :gb: United Kingdom · :greece: Greece · :ireland: Ireland · :india: India · :it: Italy · :jp: Japan · :luxembourg: Luxembourg · :mexico: Mexico · :netherlands: Netherlands · :norway: Norway · :new_zealand: New Zealand · :poland: Poland · :portugal: Portugal · :saudi_arabia: Saudi Arabia · :sweden: Sweden · :singapore: Singapore · :united_arab_emirates: UAE · :us: United States
 
 ## :jigsaw: How It Works
 

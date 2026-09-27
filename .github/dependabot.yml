@@ -10,15 +10,28 @@ updates:
       development:
         dependency-type: development
     ignore:
-      # Keep the Vite toolchain on the majors supported by vite-plugin-pwa@1.2.0.
+      # vite-plugin-pwa gates which vite majors we can run; 1.3.0 supports up to
+      # vite 8, which is where we are.
       - dependency-name: "vite"
         update-types: ["version-update:semver-major"]
       - dependency-name: "@vitejs/plugin-react"
         update-types: ["version-update:semver-major"]
-      - dependency-name: "eslint"
-        versions: [">=10"]
-      - dependency-name: "@eslint/js"
-        versions: [">=10"]
+      # vite-plugin-pwa@1.3.0 declares an optional peer on
+      # @vite-pwa/assets-generator ^1.0.0, and npm still refuses to resolve an
+      # out-of-range optional peer, so 2.x breaks `npm ci`.
+      # Lift when vite-plugin-pwa accepts v2.
+      - dependency-name: "@vite-pwa/assets-generator"
+        update-types: ["version-update:semver-major"]
+      # TypeScript 7.0 deliberately ships without a programmatic compiler API, so
+      # typescript-eslint cannot run on it at all -- as with Vue, Astro, Svelte and
+      # ts-jest, upstream guidance is to stay on 6.0 for now. Every published
+      # typescript-eslint declares typescript ">=4.8.4 <6.1.0", so this is a version
+      # ceiling rather than a major-only ignore: a future 6.1 would break it too.
+      # Lift when TS 7.1 ships its API and typescript-eslint's native backend
+      # (typescript-eslint#10940) leaves experimental.
+      # Note: this also suppresses security updates for typescript.
+      - dependency-name: "typescript"
+        versions: [">=6.1"]
     open-pull-requests-limit: 10
 
   - package-ecosystem: github-actions

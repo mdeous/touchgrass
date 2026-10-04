@@ -16,6 +16,14 @@ const COUNTRIES = [
 const YEARS = [2024, 2025, 2026, 2027, 2028, 2029] as const
 const ALLOWED_TYPES = new Set(['public', 'bank'])
 
+// Countries whose country-level data is incomplete, mapped to the
+// subdivision used when no region is picked. GB: date-holidays defines the
+// Summer bank holiday only per nation, so the country level misses it; use
+// England (England & Wales, ~89% of the UK population per ONS mid-2024).
+const DEFAULT_SUBDIVISION: Readonly<Record<string, { code: string; label: string }>> = {
+  GB: { code: 'ENG', label: 'United Kingdom (England & Wales)' },
+}
+
 interface HolidayEntry {
   readonly date: string
   readonly name: string
@@ -86,6 +94,12 @@ function generateCountry(countryCode: string): { readonly data: CountryData; rea
       }
       holidays[stateCode] = stateYears
     }
+  }
+
+  const fallback = DEFAULT_SUBDIVISION[countryCode]
+  if (fallback && holidays[fallback.code]) {
+    holidays['default'] = holidays[fallback.code]
+    subdivisions['default'] = fallback.label
   }
 
   const subdivisionKeys = Object.keys(subdivisions)

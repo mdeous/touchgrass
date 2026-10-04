@@ -111,3 +111,17 @@ describe("optimize", () => {
     expect(keys(run({ calendar }))).not.toContain("2026-05-15");
   });
 });
+
+describe("optimize with untrusted input", () => {
+  it("handles a huge or invalid budget without blowing up", () => {
+    for (const budget of [1e9, Infinity, NaN, -5]) {
+      const breaks = run({ budget });
+      expect(Array.isArray(breaks)).toBe(true);
+    }
+  });
+
+  it("falls back to balanced for an unknown strategy", () => {
+    const unknown = run({ strategy: "nope" as Strategy });
+    expect(keys(unknown)).toEqual(keys(run({ strategy: "balanced" })));
+  });
+});

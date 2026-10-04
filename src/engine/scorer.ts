@@ -15,6 +15,13 @@ const STRATEGY_SHAPES: Readonly<Record<Strategy, StrategyShape>> = {
   extended: { idealLength: 16, shortBreaks: false, leaveCost: 0.5 },
 }
 
+/** Unknown strategies (e.g. from a hand-edited URL) fall back to balanced. */
+function shapeFor(strategy: Strategy): StrategyShape {
+  return Object.hasOwn(STRATEGY_SHAPES, strategy)
+    ? STRATEGY_SHAPES[strategy]
+    : STRATEGY_SHAPES.balanced
+}
+
 /**
  * How much the strategy likes a break of `length` days, between 0 and 1.
  * Long-weekends: full value up to the ideal length, then less. Others: value
@@ -38,7 +45,7 @@ export function breakValue(
   strategy: Strategy,
 ): number {
   if (length <= 0) return 0
-  return freeDays * lengthWeight(length, STRATEGY_SHAPES[strategy])
+  return freeDays * lengthWeight(length, shapeFor(strategy))
 }
 
 /**
@@ -46,5 +53,5 @@ export function breakValue(
  * spent where it adds more value than this.
  */
 export function leaveDayCost(strategy: Strategy): number {
-  return STRATEGY_SHAPES[strategy].leaveCost
+  return shapeFor(strategy).leaveCost
 }

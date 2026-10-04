@@ -58,9 +58,7 @@ interface Step {
 export function optimize(input: OptimizeInput): Bridge[] {
   const { calendar, strategy, blocked, forcedLeave } = input;
   const minEfficiency = input.minEfficiency ?? DEFAULT_MIN_EFFICIENCY;
-  const budget = Math.max(0, Math.floor(input.budget));
   const n = calendar.length;
-  const width = budget + 1;
   const leaveCost = leaveDayCost(strategy);
 
   const alreadyOff = calendar.map((d) => isAlreadyOff(d, forcedLeave));
@@ -72,6 +70,13 @@ export function optimize(input: OptimizeInput): Bridge[] {
       !blocked.has(d.dateKey) &&
       !forcedLeave.has(d.dateKey),
   );
+
+  // More budget than eligible days can't be spent; capping it also bounds
+  // the DP table when the budget comes from an untrusted URL.
+  const eligibleCount = eligible.filter(Boolean).length;
+  const requested = Number.isFinite(input.budget) ? Math.floor(input.budget) : 0;
+  const budget = Math.min(Math.max(0, requested), eligibleCount);
+  const width = budget + 1;
 
   const best = new Float64Array((n + 1) * width).fill(-Infinity);
   const steps: (Step | undefined)[] = new Array((n + 1) * width);

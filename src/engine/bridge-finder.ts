@@ -1,5 +1,7 @@
 import { format, addDays, differenceInCalendarDays } from "date-fns";
-import type { Bridge, DayInfo } from "@/engine/types";
+import type { Bridge, DayInfo, Holiday } from "@/engine/types";
+
+const MAX_GAP_DAYS = 4;
 
 function isOffDay(day: DayInfo): boolean {
   return (
@@ -10,58 +12,11 @@ function isOffDay(day: DayInfo): boolean {
   );
 }
 
-function findAdjacentHolidays(
-  gap: DayInfo[],
-  calendarMap: Map<string, DayInfo>,
-): { namesEn: string[]; namesLocal: string[] } {
-  const namesEn: string[] = [];
-  const namesLocal: string[] = [];
-
-  if (gap.length === 0) return { namesEn, namesLocal };
-
-  const firstGapDate = gap[0].date;
-  const lastGapDate = gap[gap.length - 1].date;
-
-  let checkBefore = addDays(firstGapDate, -1);
-  for (let i = 0; i < 10; i++) {
-    const key = format(checkBefore, "yyyy-MM-dd");
-    const day = calendarMap.get(key);
-    if (!day || (!day.isWeekend && day.type !== "holiday")) break;
-    if (day.holiday) {
-      namesEn.push(day.holiday.nameEn);
-      namesLocal.push(day.holiday.name);
-    }
-    checkBefore = addDays(checkBefore, -1);
-  }
-
-  let checkAfter = addDays(lastGapDate, 1);
-  for (let i = 0; i < 10; i++) {
-    const key = format(checkAfter, "yyyy-MM-dd");
-    const day = calendarMap.get(key);
-    if (!day || (!day.isWeekend && day.type !== "holiday")) break;
-    if (day.holiday) {
-      namesEn.push(day.holiday.nameEn);
-      namesLocal.push(day.holiday.name);
-    }
-    checkAfter = addDays(checkAfter, 1);
-  }
-
-  return { namesEn, namesLocal };
-}
-
 function findClusterBounds(
   gap: DayInfo[],
   calendarMap: Map<string, DayInfo>,
-): {
-  start: Date;
-  end: Date;
-  totalDaysOff: number;
-  weekendsAndHolidays: number;
-} {
-  const firstGapDate = gap[0].date;
-  const lastGapDate = gap[gap.length - 1].date;
-
-  let clusterStart = firstGapDate;
+): { start: Date; end: Date; days: DayInfo[] } {
+  let clusterStart = gap[0].date;
   let prevDay = addDays(clusterStart, -1);
   let prevInfo = calendarMap.get(format(prevDay, "yyyy-MM-dd"));
   while (prevInfo && isOffDay(prevInfo)) {
@@ -70,7 +25,7 @@ function findClusterBounds(
     prevInfo = calendarMap.get(format(prevDay, "yyyy-MM-dd"));
   }
 
-  let clusterEnd = lastGapDate;
+  let clusterEnd = gap[gap.length - 1].date;
   let nextDay = addDays(clusterEnd, 1);
   let nextInfo = calendarMap.get(format(nextDay, "yyyy-MM-dd"));
   while (nextInfo && isOffDay(nextInfo)) {
@@ -79,93 +34,96 @@ function findClusterBounds(
     nextInfo = calendarMap.get(format(nextDay, "yyyy-MM-dd"));
   }
 
-  const totalDaysOff = differenceInCalendarDays(clusterEnd, clusterStart) + 1;
-  let weekendsAndHolidays = 0;
-  let current = clusterStart;
-  for (let i = 0; i < totalDaysOff; i++) {
-    const key = format(current, "yyyy-MM-dd");
-    const info = calendarMap.get(key);
-    if (info && isOffDay(info)) {
-      weekendsAndHolidays++;
-    }
-    current = addDays(current, 1);
+  const days: DayInfo[] = [];
+  const length = differenceInCalendarDays(clusterEnd, clusterStart) + 1;
+  for (let i = 0; i < length; i++) {
+    const info = calendarMap.get(format(addDays(clusterStart, i), "yyyy-MM-dd"));
+    if (info) days.push(info);
   }
 
-  return {
-    start: clusterStart,
-    end: clusterEnd,
-    totalDaysOff,
-    weekendsAndHolidays,
-  };
+  return { start: clusterStart, end: clusterEnd, days };
 }
 
-function buildPontName(adjacentHolidayNames: readonly string[]): string | null {
-  if (adjacentHolidayNames.length === 0) return null;
-  return adjacentHolidayNames[adjacentHolidayNames.length - 1];
+/** The holiday in the cluster closest to the gap names the bridge. */
+function nearestHoliday(
+  clusterDays: readonly DayInfo[],
+  gap: readonly DayInfo[],
+): Holiday | null {
+  const gapStart = gap[0].date;
+  const gapEnd = gap[gap.length - 1].date;
+  let best: Holiday | null = null;
+  let bestDistance = Infinity;
+  for (const day of clusterDays) {
+    if (!day.holiday) continue;
+    const distance =
+      day.date < gapStart
+        ? differenceInCalendarDays(gapStart, day.date)
+        : differenceInCalendarDays(day.date, gapEnd);
+    if (distance < bestDistance) {
+      best = day.holiday;
+      bestDistance = distance;
+    }
+  }
+  return best;
 }
 
-export function findBridges(calendar: DayInfo[], today?: Date): Bridge[] {
+/**
+ * Lists candidate bridges: runs of 1–4 workdays that would join a holiday to
+ * the surrounding days off. Used to show and toggle bridges in the UI; the
+ * optimizer itself works on the whole calendar.
+ *
+ * The calendar may include margin days from neighbouring years so bridges at
+ * the year boundary are found; gaps must lie entirely within the year.
+ * Bridge ids are stable: `bridge-<first gap day>`.
+ */
+export function findBridges(calendar: readonly DayInfo[], today?: Date): Bridge[] {
   const calendarMap = new Map<string, DayInfo>();
   for (const day of calendar) {
     calendarMap.set(day.dateKey, day);
   }
 
   const todayKey = format(today ?? new Date(), "yyyy-MM-dd");
-
   const bridges: Bridge[] = [];
-  let gapDays: DayInfo[] = [];
-  let bridgeIndex = 0;
 
+  const flush = (gap: DayInfo[]) => {
+    if (gap.length === 0 || gap.length > MAX_GAP_DAYS) return;
+    if (gap.some((d) => !d.inYear || d.dateKey < todayKey)) return;
+
+    const cluster = findClusterBounds(gap, calendarMap);
+    const holidays = cluster.days.flatMap((d) => (d.holiday ? [d.holiday] : []));
+    if (holidays.length === 0) return;
+
+    const named = nearestHoliday(cluster.days, gap);
+    const ptoCost = gap.length;
+    const totalDaysOff = cluster.days.length;
+
+    bridges.push({
+      id: `bridge-${gap[0].dateKey}`,
+      days: gap.map((d) => new Date(d.date.getTime())),
+      ptoCost,
+      totalDaysOff,
+      gainedDays: totalDaysOff - ptoCost,
+      efficiency: totalDaysOff / ptoCost,
+      adjacentHolidays: holidays.map((h) => h.nameEn),
+      pontName: named?.nameEn ?? null,
+      pontNameLocal: named?.name ?? null,
+      startDate: cluster.start,
+      endDate: cluster.end,
+      weightedScore: 0,
+    });
+  };
+
+  let gapDays: DayInfo[] = [];
   for (const day of calendar) {
     if (day.type === "workday") {
       gapDays.push(day);
     } else {
-      if (gapDays.length > 0 && gapDays.length <= 4) {
-        const hasPastDay = gapDays.some((d) => d.dateKey < todayKey);
-        if (hasPastDay) {
-          gapDays = [];
-          continue;
-        }
-
-        const beforeGap = calendarMap.get(
-          format(addDays(gapDays[0].date, -1), "yyyy-MM-dd"),
-        );
-        const afterGap = calendarMap.get(
-          format(addDays(gapDays[gapDays.length - 1].date, 1), "yyyy-MM-dd"),
-        );
-
-        const hasBefore = beforeGap && isOffDay(beforeGap);
-        const hasAfter = afterGap && isOffDay(afterGap);
-
-        if (hasBefore || hasAfter) {
-          const { namesEn, namesLocal } = findAdjacentHolidays(
-            gapDays,
-            calendarMap,
-          );
-          const cluster = findClusterBounds(gapDays, calendarMap);
-          const ptoCost = gapDays.length;
-          const gainedDays = cluster.totalDaysOff - ptoCost;
-          const efficiency = ptoCost > 0 ? cluster.totalDaysOff / ptoCost : 0;
-
-          bridges.push({
-            id: `bridge-${bridgeIndex++}`,
-            days: gapDays.map((d) => new Date(d.date.getTime())),
-            ptoCost,
-            totalDaysOff: cluster.totalDaysOff,
-            gainedDays,
-            efficiency,
-            adjacentHolidays: namesEn,
-            pontName: buildPontName(namesEn),
-            pontNameLocal: buildPontName(namesLocal),
-            startDate: cluster.start,
-            endDate: cluster.end,
-            weightedScore: 0,
-          });
-        }
-      }
+      flush(gapDays);
       gapDays = [];
     }
   }
+  // The calendar can end on a workday; don't drop that last gap.
+  flush(gapDays);
 
   return bridges;
 }

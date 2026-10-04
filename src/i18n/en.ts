@@ -5,6 +5,7 @@ const en = {
   // AppShell
   "app.configuration": "Configuration",
   "app.loadingHolidays": "Loading holidays...",
+  "app.noHolidayData": "No public holiday data is available for {{year}} in this country.",
 
   // Config panel sections
   "config.location": "Location",

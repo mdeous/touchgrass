@@ -5,6 +5,7 @@ const fr = {
   // AppShell
   "app.configuration": "Configuration",
   "app.loadingHolidays": "Chargement des jours fériés...",
+  "app.noHolidayData": "Aucune donnée de jours fériés disponible pour {{year}} dans ce pays.",
 
   // Config panel sections
   "config.location": "Localisation",

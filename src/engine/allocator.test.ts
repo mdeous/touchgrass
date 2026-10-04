@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { allocate } from "@/engine/allocator";
-import type { Bridge, LeaveType } from "@/engine/types";
+import type { Bridge } from "@/engine/types";
 
 function makeBridge(overrides: Partial<Bridge> & { id: string }): Bridge {
   return {
@@ -24,7 +24,7 @@ describe("allocate", () => {
     const bridges = [
       makeBridge({ id: "a", ptoCost: 1, days: [new Date(2026, 4, 15)] }),
     ];
-    const allocations = allocate(bridges, 25, 9, {});
+    const allocations = allocate(bridges, 25, 9);
     expect(allocations).toHaveLength(1);
     expect(allocations[0].leaveType).toBe("recovery");
   });
@@ -41,7 +41,7 @@ describe("allocate", () => {
         ],
       }),
     ];
-    const allocations = allocate(bridges, 25, 9, {});
+    const allocations = allocate(bridges, 25, 9);
     expect(allocations).toHaveLength(3);
     for (const a of allocations) {
       expect(a.leaveType).toBe("recovery");
@@ -52,7 +52,7 @@ describe("allocate", () => {
     const bridges = [
       makeBridge({ id: "a", ptoCost: 1, days: [new Date(2026, 4, 15)] }),
     ];
-    const allocations = allocate(bridges, 25, 0, {});
+    const allocations = allocate(bridges, 25, 0);
     expect(allocations).toHaveLength(1);
     expect(allocations[0].leaveType).toBe("pto");
   });
@@ -65,7 +65,7 @@ describe("allocate", () => {
         days: [new Date(2026, 4, 11), new Date(2026, 4, 12)],
       }),
     ];
-    const allocations = allocate(bridges, 0, 9, {});
+    const allocations = allocate(bridges, 0, 9);
     expect(allocations).toHaveLength(2);
     for (const a of allocations) {
       expect(a.leaveType).toBe("recovery");
@@ -84,46 +84,45 @@ describe("allocate", () => {
         ],
       }),
     ];
-    const allocations = allocate(bridges, 25, 0, {});
+    const allocations = allocate(bridges, 25, 0);
     expect(allocations).toHaveLength(3);
     for (const a of allocations) {
       expect(a.leaveType).toBe("pto");
     }
   });
 
-  it("includes pre-booked allocations", () => {
-    const preBooked: Record<string, LeaveType> = {
-      "2026-03-16": "pto",
-    };
-    const bridges = [
-      makeBridge({ id: "a", ptoCost: 1, days: [new Date(2026, 4, 15)] }),
-    ];
-    const allocations = allocate(bridges, 25, 9, preBooked);
-    expect(allocations).toHaveLength(2);
-    const preBookedAlloc = allocations.find(
-      (a) => a.date.getMonth() === 2 && a.date.getDate() === 16,
-    );
-    expect(preBookedAlloc).toBeDefined();
-    expect(preBookedAlloc!.leaveType).toBe("pto");
+  it("gives recovery to the shortest breaks first", () => {
+    const long = makeBridge({
+      id: "long",
+      ptoCost: 2,
+      days: [new Date(2026, 4, 11), new Date(2026, 4, 12)],
+    });
+    const short = makeBridge({
+      id: "short",
+      ptoCost: 1,
+      days: [new Date(2026, 4, 15)],
+    });
+    const allocations = allocate([long, short], 25, 1);
+    const typeOn = (day: number) =>
+      allocations.find((a) => a.date.getDate() === day)!.leaveType;
+    expect(typeOn(15)).toBe("recovery");
+    expect(typeOn(11)).toBe("pto");
+    expect(typeOn(12)).toBe("pto");
   });
 
-  it("does not deduct pre-booked from budgets", () => {
-    const preBooked: Record<string, LeaveType> = {
-      "2026-03-16": "recovery",
-    };
+  it("skips days once both budgets are spent", () => {
     const bridges = [
-      makeBridge({ id: "a", ptoCost: 1, days: [new Date(2026, 4, 15)] }),
+      makeBridge({
+        id: "a",
+        ptoCost: 2,
+        days: [new Date(2026, 4, 11), new Date(2026, 4, 12)],
+      }),
     ];
-    const allocations = allocate(bridges, 0, 1, preBooked);
-    const bridgeAlloc = allocations.find(
-      (a) => a.date.getMonth() === 4 && a.date.getDate() === 15,
-    );
-    expect(bridgeAlloc).toBeDefined();
-    expect(bridgeAlloc!.leaveType).toBe("recovery");
+    expect(allocate(bridges, 1, 0)).toHaveLength(1);
   });
 
   it("returns empty array when no bridges selected", () => {
-    const allocations = allocate([], 25, 9, {});
+    const allocations = allocate([], 25, 9);
     expect(allocations).toHaveLength(0);
   });
 });

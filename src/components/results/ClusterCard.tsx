@@ -25,11 +25,7 @@ export function ClusterCard({
   const locale = useDateLocale();
   const toggleBridgeDisabled = useAppStore((s) => s.toggleBridgeDisabled);
 
-  const handleToggle = () => {
-    if (bridge.pontName) {
-      toggleBridgeDisabled(bridge.pontName);
-    }
-  };
+  const handleToggle = () => toggleBridgeDisabled(bridge.id);
 
   const lang = i18n.language;
   const s = formatShortDate(bridge.startDate, locale, lang);

@@ -1,51 +1,38 @@
-import { format } from "date-fns";
 import type { Allocation, Bridge, LeaveType } from "@/engine/types";
 
+/**
+ * Assigns a leave type to every leave day of the selected breaks. Recovery
+ * days go first, to the shortest breaks first, then PTO. `ptoAvailable` and
+ * `recoveryAvailable` are what is left after pre-booked and manual leave.
+ */
 export function allocate(
   selectedBridges: readonly Bridge[],
-  ptoBudget: number,
-  recoveryBudget: number,
-  preBookedTypes: Readonly<Record<string, LeaveType>>,
+  ptoAvailable: number,
+  recoveryAvailable: number,
 ): Allocation[] {
-  let ptoRemaining = ptoBudget;
-  let recoveryRemaining = recoveryBudget;
-
-  const preBookedAllocations: Allocation[] = Object.entries(preBookedTypes).map(
-    ([dateKey, leaveType]) => {
-      const [y, m, d] = dateKey.split("-").map(Number);
-      return { date: new Date(y, m - 1, d), leaveType };
-    },
-  );
-
-  const bridgeAllocations: Allocation[] = [];
+  let ptoRemaining = ptoAvailable;
+  let recoveryRemaining = recoveryAvailable;
 
   const sortedBridges = [...selectedBridges].sort(
     (a, b) => a.ptoCost - b.ptoCost,
   );
 
+  const allocations: Allocation[] = [];
   for (const bridge of sortedBridges) {
     for (const day of bridge.days) {
-      const dateKey = format(day, "yyyy-MM-dd");
-      if (preBookedTypes[dateKey]) continue;
-
-      let assignedType: LeaveType;
-
+      let leaveType: LeaveType;
       if (recoveryRemaining > 0) {
-        assignedType = "recovery";
+        leaveType = "recovery";
         recoveryRemaining--;
       } else if (ptoRemaining > 0) {
-        assignedType = "pto";
+        leaveType = "pto";
         ptoRemaining--;
       } else {
         continue;
       }
-
-      bridgeAllocations.push({
-        date: new Date(day.getTime()),
-        leaveType: assignedType,
-      });
+      allocations.push({ date: new Date(day.getTime()), leaveType });
     }
   }
 
-  return [...preBookedAllocations, ...bridgeAllocations];
+  return allocations.sort((a, b) => a.date.getTime() - b.date.getTime());
 }

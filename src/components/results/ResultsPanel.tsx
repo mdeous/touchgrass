@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { SummaryStats } from "@/components/results/SummaryStats";
 import { TimeOffSummary } from "@/components/results/TimeOffSummary";
@@ -12,15 +13,8 @@ interface ResultsPanelProps {
   readonly onBridgeHover?: (bridgeId: string | null) => void;
 }
 
-function getUniquePonts(bridges: readonly Bridge[]): Bridge[] {
-  const seen = new Set<string>();
-  const unique: Bridge[] = [];
-  for (const b of bridges) {
-    if (!b.pontName || seen.has(b.pontName)) continue;
-    seen.add(b.pontName);
-    unique.push(b);
-  }
-  return unique;
+function isBridgeSelected(bridge: Bridge, leaveKeys: ReadonlySet<string>) {
+  return bridge.days.some((d) => leaveKeys.has(format(d, "yyyy-MM-dd")));
 }
 
 export function ResultsPanel({
@@ -30,11 +24,12 @@ export function ResultsPanel({
   onBridgeHover,
 }: ResultsPanelProps) {
   const { t } = useTranslation();
-  const ponts = getUniquePonts(allBridges);
   const disabledSet = new Set(config.disabledBridges);
-  const selectedSet = new Set(result.selectedBridges.map((b) => b.pontName));
+  const leaveKeys = new Set(
+    result.allocations.map((a) => format(a.date, "yyyy-MM-dd")),
+  );
 
-  if (ponts.length === 0) {
+  if (allBridges.length === 0 && result.allocations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-12 text-muted-foreground">
         <p className="text-sm">{t("results.noResults")}</p>
@@ -75,9 +70,9 @@ export function ResultsPanel({
           })}
         </p>
         <div className="flex flex-col">
-          {ponts.map((bridge) => {
-            const isDisabled = disabledSet.has(bridge.pontName!);
-            const isSelected = selectedSet.has(bridge.pontName);
+          {allBridges.map((bridge) => {
+            const isDisabled = disabledSet.has(bridge.id);
+            const isSelected = !isDisabled && isBridgeSelected(bridge, leaveKeys);
             return (
               <ClusterCard
                 key={bridge.id}

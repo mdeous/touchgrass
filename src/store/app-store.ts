@@ -24,7 +24,7 @@ interface AppState extends AppConfig {
   addCustomHoliday: (dateKey: string) => void;
   removeCustomHoliday: (dateKey: string) => void;
   toggleManualOverride: (dateKey: string, leaveType: LeaveType | null) => void;
-  toggleBridgeDisabled: (pontName: string) => void;
+  toggleBridgeDisabled: (bridgeId: string) => void;
   resetConfig: () => void;
 }
 
@@ -115,11 +115,11 @@ export const useAppStore = create<AppState>()((set) => ({
       };
     }),
 
-  toggleBridgeDisabled: (pontName) =>
+  toggleBridgeDisabled: (bridgeId) =>
     set((state) => ({
-      disabledBridges: state.disabledBridges.includes(pontName)
-        ? state.disabledBridges.filter((n) => n !== pontName)
-        : [...state.disabledBridges, pontName],
+      disabledBridges: state.disabledBridges.includes(bridgeId)
+        ? state.disabledBridges.filter((id) => id !== bridgeId)
+        : [...state.disabledBridges, bridgeId],
     })),
 
   resetConfig: () =>

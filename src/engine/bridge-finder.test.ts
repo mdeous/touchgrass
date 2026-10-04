@@ -95,4 +95,33 @@ describe("findBridges", () => {
       }
     }
   });
+
+  it("finds the bridge before New Year when the calendar has margin days", () => {
+    const holidays = [2026, 2027].flatMap((y) =>
+      getHolidaysForYear(y, "metropolitan"),
+    );
+    const calendar = buildCalendar(makeConfig(), holidays, 14);
+    const bridges = findBridges(calendar, startOfYear);
+    const yearEnd = bridges.find((b) => b.id === "bridge-2026-12-28");
+    expect(yearEnd).toBeDefined();
+    expect(yearEnd!.ptoCost).toBe(4);
+    expect(yearEnd!.totalDaysOff).toBe(10);
+  });
+
+  it("keeps two bridges around the same holiday apart", () => {
+    // Armistice 2026 is a Wednesday: Mon–Tue before and Thu–Fri after.
+    const bridges = findBridges(buildFranceCalendar(), startOfYear);
+    const armistice = bridges.filter((b) => b.pontName === "Armistice Day");
+    expect(armistice.map((b) => b.id)).toEqual([
+      "bridge-2026-11-09",
+      "bridge-2026-11-12",
+    ]);
+  });
+
+  it("ignores gaps that don't touch a holiday", () => {
+    // A blackout on Wednesday splits a normal week into two short gaps.
+    const calendar = buildFranceCalendar({ blackoutDates: ["2026-06-17"] });
+    const bridges = findBridges(calendar, startOfYear);
+    expect(bridges.some((b) => b.id === "bridge-2026-06-15")).toBe(false);
+  });
 });

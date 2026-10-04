@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Settings } from "lucide-react";
 import { Toaster } from "sonner";
@@ -41,26 +41,45 @@ export function AppShell() {
   const manualOverrides = useAppStore((s) => s.manualOverrides);
   const disabledBridges = useAppStore((s) => s.disabledBridges);
 
-  const config: AppConfig = {
-    year,
-    country,
-    subdivision,
-    weekendDays,
-    schoolZone,
-    ptoBudget,
-    recoveryBudget,
-    strategy,
-    blackoutDates,
-    preBookedDates,
-    preBookedTypes,
-    customHolidays,
-    manualOverrides,
-    disabledBridges,
-  };
+  const config: AppConfig = useMemo(
+    () => ({
+      year,
+      country,
+      subdivision,
+      weekendDays,
+      schoolZone,
+      ptoBudget,
+      recoveryBudget,
+      strategy,
+      blackoutDates,
+      preBookedDates,
+      preBookedTypes,
+      customHolidays,
+      manualOverrides,
+      disabledBridges,
+    }),
+    [
+      year,
+      country,
+      subdivision,
+      weekendDays,
+      schoolZone,
+      ptoBudget,
+      recoveryBudget,
+      strategy,
+      blackoutDates,
+      preBookedDates,
+      preBookedTypes,
+      customHolidays,
+      manualOverrides,
+      disabledBridges,
+    ],
+  );
 
   useUrlState();
 
-  const { calendar, result, allBridges, loading } = useOptimization(config);
+  const { calendar, result, allBridges, loading, noData } =
+    useOptimization(config);
 
   const ptoRemaining = config.ptoBudget - result.ptoUsed;
   const recoveryRemaining = config.recoveryBudget - result.recoveryUsed;
@@ -103,6 +122,12 @@ export function AppShell() {
           {loading ? (
             <div className="flex items-center justify-center py-12 text-muted-foreground">
               <p className="text-sm">{t("app.loadingHolidays")}</p>
+            </div>
+          ) : noData ? (
+            <div className="flex items-center justify-center py-12 text-muted-foreground">
+              <p className="text-sm">
+                {t("app.noHolidayData", { year: config.year })}
+              </p>
             </div>
           ) : (
             <CalendarGrid

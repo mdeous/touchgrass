@@ -128,6 +128,7 @@ const fr = {
   "export.shareLink": "Partager le lien",
   "export.icsDownloaded": "Fichier calendrier téléchargé",
   "export.icsFailed": "Impossible de générer le fichier calendrier",
+  "export.icsEmpty": "Aucune pause à exporter pour l'instant",
   "export.summaryCopied": "Résumé copié dans le presse-papiers",
   "export.summaryFailed": "Impossible de copier le résumé",
   "export.linkCopied": "Lien de partage copié dans le presse-papiers",

@@ -19,8 +19,11 @@ export function ExportActions({ result, config }: ExportActionsProps) {
 
   const handleDownloadIcs = () => {
     try {
-      downloadIcs(result, config.year);
-      toast.success(t("export.icsDownloaded"));
+      if (downloadIcs(result, config.year)) {
+        toast.success(t("export.icsDownloaded"));
+      } else {
+        toast.info(t("export.icsEmpty"));
+      }
     } catch {
       toast.error(t("export.icsFailed"));
     }

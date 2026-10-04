@@ -127,6 +127,7 @@ const en = {
   "export.shareLink": "Share link",
   "export.icsDownloaded": "Calendar file downloaded",
   "export.icsFailed": "Failed to generate calendar file",
+  "export.icsEmpty": "No breaks to export yet",
   "export.summaryCopied": "Summary copied to clipboard",
   "export.summaryFailed": "Failed to copy summary",
   "export.linkCopied": "Share link copied to clipboard",
@@ -135,8 +136,8 @@ const en = {
   // ICS / text summary
   "export.pontTitle": "Pont: {{name}}",
   "export.ptoTitle": "PTO",
-  "export.bridgeDesc_one": "{{total}} days off ({{count}} PTO day)",
-  "export.bridgeDesc_other": "{{total}} days off ({{count}} PTO days)",
+  "export.bridgeDesc_one": "{{total}} days off ({{count}} leave day)",
+  "export.bridgeDesc_other": "{{total}} days off ({{count}} leave days)",
   "export.calendarName": "TouchGrass {{year}}",
   "export.planHeader": "TouchGrass PTO plan {{year}}",
   "export.totalDaysOff": "Total days off: {{count}}",

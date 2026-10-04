@@ -1,4 +1,4 @@
-import { format, addDays, isWithinInterval } from "date-fns";
+import { format, addDays } from "date-fns";
 import type { AppConfig, DayInfo, DayType, Holiday } from "@/engine/types";
 import { getSchoolHolidays } from "@/data/france/school-holidays";
 
@@ -62,9 +62,8 @@ export function buildCalendar(
 
     let schoolHolidayName: string | null = null;
     for (const period of schoolHolidayPeriods) {
-      if (
-        isWithinInterval(current, { start: period.start, end: period.end })
-      ) {
+      // period.end is the day classes resume, so it is exclusive.
+      if (current >= period.start && current < period.end) {
         schoolHolidayName = period.name;
         break;
       }

@@ -93,6 +93,25 @@ describe("buildCalendar", () => {
     expect(schoolDays.length).toBeGreaterThan(0);
   });
 
+  it("uses the official 2026 winter dates for zones B and C", () => {
+    const zoneB = buildFranceCalendar({ schoolZone: "B" });
+    const zoneC = buildFranceCalendar({ schoolZone: "C" });
+    const isOn = (cal: typeof zoneB, key: string) =>
+      cal.find((d) => d.dateKey === key)!.isSchoolHoliday;
+    expect(isOn(zoneB, "2026-02-16")).toBe(true);
+    expect(isOn(zoneB, "2026-03-02")).toBe(false);
+    expect(isOn(zoneC, "2026-02-16")).toBe(false);
+    expect(isOn(zoneC, "2026-02-23")).toBe(true);
+  });
+
+  it("does not mark the day classes resume as a school holiday", () => {
+    const calendar = buildFranceCalendar({ schoolZone: "A" });
+    const lastDay = calendar.find((d) => d.dateKey === "2026-11-01")!;
+    const resumeDay = calendar.find((d) => d.dateKey === "2026-11-02")!;
+    expect(lastDay.isSchoolHoliday).toBe(true);
+    expect(resumeDay.isSchoolHoliday).toBe(false);
+  });
+
   it("has no school holidays when zone is none", () => {
     const calendar = buildFranceCalendar({ schoolZone: "none" });
     const schoolDays = calendar.filter((d) => d.isSchoolHoliday);

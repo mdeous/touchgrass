@@ -9,6 +9,17 @@ import {
 import { useDateLocale } from "@/hooks/use-date-locale";
 import type { DayInfo, DayType } from "@/engine/types";
 
+const dayTypeLegendKey: Record<DayType, string> = {
+  workday: "legend.workday",
+  weekend: "legend.weekend",
+  holiday: "legend.holiday",
+  pto: "legend.pto",
+  recovery: "legend.recovery",
+  blackout: "legend.blackout",
+  "prebooked-pto": "legend.prebooked",
+  "prebooked-recovery": "legend.prebooked",
+};
+
 const dayTypeStyles: Record<DayType, string> = {
   workday: "bg-background hover:bg-accent",
   weekend: "bg-day-weekend text-muted-foreground",
@@ -40,9 +51,9 @@ export function DayCell({ day, onToggle }: DayCellProps) {
       : null;
 
   const tooltipParts = [
-    format(day.date, "EEEE, MMMM d, yyyy", { locale }),
+    format(day.date, "PPPP", { locale }),
     holidayName,
-    t("dayCell.type", { type: day.type }),
+    t("dayCell.type", { type: t(dayTypeLegendKey[day.type]) }),
     day.isSchoolHoliday && day.schoolZoneName
       ? t("dayCell.schoolHoliday", { zone: day.schoolZoneName })
       : null,

@@ -1,8 +1,12 @@
 import { format } from "date-fns";
 import type { Locale } from "date-fns";
 
+// Capitalize the first letter of each word. `\b` is ASCII-only in JS and
+// would treat accented letters as word boundaries ("févr." -> "FÉVr.").
 const capitalize = (s: string) =>
-  s.replace(/\b[a-zA-Z\u00C0-\u00FF]/g, (c) => c.toUpperCase());
+  s.replace(/(^|\s)(\p{L})/gu, (_, space: string, c: string) =>
+    space + c.toUpperCase(),
+  );
 
 export function formatShortDate(
   date: Date,

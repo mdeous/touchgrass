@@ -41,7 +41,9 @@ export function useUrlState() {
   const strategy = useAppStore((s) => s.strategy);
   const blackoutDates = useAppStore((s) => s.blackoutDates);
   const preBookedDates = useAppStore((s) => s.preBookedDates);
+  const preBookedTypes = useAppStore((s) => s.preBookedTypes);
   const customHolidays = useAppStore((s) => s.customHolidays);
+  const manualOverrides = useAppStore((s) => s.manualOverrides);
   const disabledBridges = useAppStore((s) => s.disabledBridges);
 
   const initializedRef = useRef(false);
@@ -63,17 +65,8 @@ export function useUrlState() {
       i18n.changeLanguage(language);
     }
 
-    const store = useAppStore.getState();
-    if (cfg.country !== "FR" || cfg.subdivision !== "metropolitan") {
-      store.setCountry(cfg.country);
-      store.setSubdivision(cfg.subdivision);
-    }
-    store.setYear(cfg.year);
-    store.setWeekendDays(cfg.weekendDays);
-    store.setSchoolZone(cfg.schoolZone);
-    store.setPtoBudget(cfg.ptoBudget);
-    store.setRecoveryBudget(cfg.recoveryBudget);
-    store.setStrategy(cfg.strategy);
+    // decodeConfig validated every field, so the whole config can be applied.
+    useAppStore.setState({ ...cfg });
   }, []);
 
   // Re-encode hash on language change
@@ -110,7 +103,9 @@ export function useUrlState() {
     strategy,
     blackoutDates,
     preBookedDates,
+    preBookedTypes,
     customHolidays,
+    manualOverrides,
     disabledBridges,
   ]);
 }

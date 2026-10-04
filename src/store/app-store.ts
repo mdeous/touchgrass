@@ -39,11 +39,11 @@ export const useAppStore = create<AppState>()((set) => ({
     const meta = getCountryMeta(country);
     set({
       country,
-      subdivision: "default",
+      subdivision: country === "FR" ? "metropolitan" : "default",
       weekendDays: meta.weekendDays,
       ptoBudget: meta.defaultPtoBudget,
       recoveryBudget: meta.defaultRecoveryBudget,
-      schoolZone: meta.hasSchoolZones ? "none" : "none",
+      schoolZone: "none",
       disabledBridges: [],
       manualOverrides: {},
     });

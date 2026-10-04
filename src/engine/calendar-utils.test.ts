@@ -71,6 +71,36 @@ describe("buildCalendar", () => {
     expect(day!.type).toBe("prebooked-recovery");
   });
 
+  it("keeps a blacked-out weekend day as a weekend", () => {
+    const calendar = buildFranceCalendar({ blackoutDates: ["2026-05-16"] });
+    const day = calendar.find((d) => d.dateKey === "2026-05-16");
+    expect(day!.type).toBe("weekend");
+  });
+
+  it("keeps a pre-booked holiday as a holiday", () => {
+    const calendar = buildFranceCalendar({
+      preBookedDates: ["2026-05-01"],
+      preBookedTypes: { "2026-05-01": "pto" },
+    });
+    const day = calendar.find((d) => d.dateKey === "2026-05-01");
+    expect(day!.type).toBe("holiday");
+  });
+
+  it("adds margin days from the neighbouring years", () => {
+    const holidays = [
+      ...getHolidaysForYear(2026, "metropolitan"),
+      ...getHolidaysForYear(2027, "metropolitan"),
+    ];
+    const calendar = buildCalendar(makeConfig(), holidays, 14);
+    expect(calendar).toHaveLength(365 + 28);
+    expect(calendar[0].dateKey).toBe("2025-12-18");
+    expect(calendar[0].inYear).toBe(false);
+    const jan1 = calendar.find((d) => d.dateKey === "2027-01-01")!;
+    expect(jan1.inYear).toBe(false);
+    expect(jan1.type).toBe("holiday");
+    expect(calendar.filter((d) => d.inYear)).toHaveLength(365);
+  });
+
   it("applies custom holidays", () => {
     const calendar = buildFranceCalendar({
       customHolidays: ["2026-06-15"],

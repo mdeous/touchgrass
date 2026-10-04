@@ -14,9 +14,16 @@ function getDaysInYear(year: number): number {
   return isLeapYear(year) ? 366 : 365;
 }
 
+/**
+ * Builds the day list for `config.year`. With `marginDays > 0`, the list also
+ * covers that many days before Jan 1 and after Dec 31 (flagged `inYear: false`)
+ * so breaks that cross the year boundary can be measured. Pass holidays for the
+ * neighbouring years too when using a margin.
+ */
 export function buildCalendar(
   config: AppConfig,
   holidays: readonly Holiday[],
+  marginDays = 0,
 ): DayInfo[] {
   const {
     year,
@@ -47,12 +54,16 @@ export function buildCalendar(
   const blackoutSet = new Set(blackoutDates);
   const preBookedSet = new Set(preBookedDates);
 
-  const schoolHolidayPeriods = getSchoolHolidays(year, schoolZone);
+  const schoolHolidayPeriods = [
+    ...(marginDays > 0 ? getSchoolHolidays(year - 1, schoolZone) : []),
+    ...getSchoolHolidays(year, schoolZone),
+    ...(marginDays > 0 ? getSchoolHolidays(year + 1, schoolZone) : []),
+  ];
 
   const weekendSet = new Set(weekendDays);
-  const daysCount = getDaysInYear(year);
+  const daysCount = getDaysInYear(year) + 2 * marginDays;
   const days: DayInfo[] = [];
-  let current = new Date(year, 0, 1);
+  let current = addDays(new Date(year, 0, 1), -marginDays);
 
   for (let i = 0; i < daysCount; i++) {
     const dateKey = makeDateKey(current);
@@ -69,16 +80,18 @@ export function buildCalendar(
       }
     }
 
+    // Blackout and pre-booked only make sense on workdays: a weekend or
+    // holiday stays off whatever the user marked on it.
     let type: DayType;
-    if (blackoutSet.has(dateKey)) {
+    if (holiday) {
+      type = "holiday";
+    } else if (isWeekend) {
+      type = "weekend";
+    } else if (blackoutSet.has(dateKey)) {
       type = "blackout";
     } else if (preBookedSet.has(dateKey)) {
       const leaveType = preBookedTypes[dateKey] ?? "pto";
       type = leaveType === "recovery" ? "prebooked-recovery" : "prebooked-pto";
-    } else if (holiday) {
-      type = "holiday";
-    } else if (isWeekend) {
-      type = "weekend";
     } else {
       type = "workday";
     }
@@ -90,6 +103,7 @@ export function buildCalendar(
       isWeekend,
       holiday,
       type,
+      inYear: current.getFullYear() === year,
       isSchoolHoliday: schoolHolidayName !== null,
       schoolZoneName: schoolHolidayName,
     });

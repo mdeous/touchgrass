@@ -29,6 +29,8 @@ export interface DayInfo {
   readonly type: DayType;
   readonly isSchoolHoliday: boolean;
   readonly schoolZoneName: string | null;
+  /** False for margin days borrowed from the previous or next year. */
+  readonly inYear: boolean;
 }
 
 export interface Bridge {

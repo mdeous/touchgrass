@@ -27,19 +27,35 @@ interface CountryData {
   readonly holidays: Record<string, Record<string, readonly HolidayEntry[]>>
 }
 
+const DAY_MS = 86_400_000
+
 function formatDate(dateStr: string): string {
   return dateStr.slice(0, 10)
 }
 
+function addDaysToKey(dateKey: string, days: number): string {
+  const [y, m, d] = dateKey.split('-').map(Number)
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10)
+}
+
 function getHolidaysForInit(hd: Holidays, year: number): readonly HolidayEntry[] {
-  const raw = hd.getHolidays(year, 'en')
-  return raw
-    .filter((h) => ALLOWED_TYPES.has(h.type))
-    .map((h) => ({
-      date: formatDate(h.date),
-      name: h.name,
-      type: h.type,
-    }))
+  const entries: HolidayEntry[] = []
+  const seen = new Set<string>()
+  for (const h of hd.getHolidays(year, 'en')) {
+    if (!ALLOWED_TYPES.has(h.type)) continue
+    // Partial days (e.g. DE Christmas Eve from 14:00) are not days off.
+    const days = Math.round((h.end.getTime() - h.start.getTime()) / DAY_MS)
+    if (days < 1) continue
+    // Multi-day holidays (e.g. Eid in SA/AE) cover every day of the range.
+    const first = formatDate(h.date)
+    for (let i = 0; i < days; i++) {
+      const date = addDaysToKey(first, i)
+      if (seen.has(date)) continue
+      seen.add(date)
+      entries.push({ date, name: h.name, type: h.type })
+    }
+  }
+  return entries
 }
 
 function generateCountry(countryCode: string): { readonly data: CountryData; readonly subdivisionKeys: readonly string[] } {

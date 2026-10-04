@@ -67,9 +67,15 @@ describe('getHolidaysForYear', () => {
 
   it('returns extra holidays for DOM-TOM regions', () => {
     const guadeloupe = getHolidaysForYear(2026, 'guadeloupe')
-    expect(guadeloupe.length).toBe(13)
+    expect(guadeloupe.length).toBe(14)
     const names = guadeloupe.map((h) => h.name)
     expect(names).toContain("Abolition de l'esclavage")
+    expect(names).toContain('Vendredi Saint')
+
+    const martinique = getHolidaysForYear(2026, 'martinique')
+    const goodFriday = martinique.find((h) => h.name === 'Vendredi Saint')!
+    expect(goodFriday.date.getMonth()).toBe(3)
+    expect(goodFriday.date.getDate()).toBe(3)
 
     const guyane = getHolidaysForYear(2026, 'guyane')
     expect(guyane.length).toBe(12)

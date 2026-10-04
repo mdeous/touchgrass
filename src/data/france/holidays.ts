@@ -69,11 +69,8 @@ function getMetropolitanHolidays(year: number): Holiday[] {
 }
 
 function getAlsaceMoselleExtras(year: number): Holiday[] {
-  const easter = computeEasterSunday(year);
-  const goodFriday = addDays(easter, -2);
-
   return [
-    { date: goodFriday, name: "Vendredi Saint", nameEn: "Good Friday" },
+    goodFriday(year),
     {
       date: new Date(year, 11, 26),
       name: "Saint-Étienne",
@@ -82,8 +79,19 @@ function getAlsaceMoselleExtras(year: number): Holiday[] {
   ];
 }
 
+function goodFriday(year: number): Holiday {
+  return {
+    date: addDays(computeEasterSunday(year), -2),
+    name: "Vendredi Saint",
+    nameEn: "Good Friday",
+  };
+}
+
+// Good Friday is a public holiday in Guadeloupe and Martinique
+// (date-holidays FR-GP / FR-MQ rules).
 const DOM_TOM_HOLIDAYS: Record<string, (year: number) => Holiday[]> = {
   guadeloupe: (year) => [
+    goodFriday(year),
     {
       date: new Date(year, 4, 27),
       name: "Abolition de l'esclavage",
@@ -96,6 +104,7 @@ const DOM_TOM_HOLIDAYS: Record<string, (year: number) => Holiday[]> = {
     },
   ],
   martinique: (year) => [
+    goodFriday(year),
     {
       date: new Date(year, 4, 22),
       name: "Abolition de l'esclavage",
@@ -141,7 +150,9 @@ export function getHolidaysForYear(year: number, region: string): Holiday[] {
     return [...base, ...getAlsaceMoselleExtras(year)];
   }
 
-  const domTomFn = DOM_TOM_HOLIDAYS[region];
+  const domTomFn = Object.hasOwn(DOM_TOM_HOLIDAYS, region)
+    ? DOM_TOM_HOLIDAYS[region]
+    : undefined;
   if (domTomFn) {
     return [...base, ...domTomFn(year)];
   }

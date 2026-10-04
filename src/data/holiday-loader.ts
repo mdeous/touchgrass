@@ -57,7 +57,9 @@ export async function loadHolidays(
   const data = await loadCountryModule(country);
   if (!data) return [];
 
-  const sub = subdivision in (data.holidays ?? {}) ? subdivision : "default";
+  const sub = Object.hasOwn(data.holidays ?? {}, subdivision)
+    ? subdivision
+    : "default";
   const yearStr = String(year);
   const holidays = data.holidays?.[sub]?.[yearStr];
   if (!holidays) return [];

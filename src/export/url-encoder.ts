@@ -180,7 +180,7 @@ export function decodeConfig(hash: string): DecodedUrl | null {
       ? (compact.y as number)
       : DEFAULT_CONFIG.year;
   const country =
-    typeof compact.cc === "string" && compact.cc in COUNTRY_MAP
+    typeof compact.cc === "string" && Object.hasOwn(COUNTRY_MAP, compact.cc)
       ? compact.cc
       : DEFAULT_CONFIG.country;
   const rawSubdivision = compact.sd ?? compact.r;

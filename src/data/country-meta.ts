@@ -171,4 +171,4 @@ export const COUNTRY_MAP: Record<string, CountryMeta> = Object.fromEntries(
 const FRANCE_FALLBACK = COUNTRY_MAP["FR"];
 
 export const getCountryMeta = (code: string): CountryMeta =>
-  COUNTRY_MAP[code] ?? FRANCE_FALLBACK;
+  Object.hasOwn(COUNTRY_MAP, code) ? COUNTRY_MAP[code] : FRANCE_FALLBACK;

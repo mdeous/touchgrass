@@ -91,6 +91,12 @@ describe("url-encoder", () => {
     expect(decoded.language).toBeUndefined();
   });
 
+  it("rejects inherited object keys as country codes", () => {
+    for (const cc of ["constructor", "toString", "__proto__", "hasOwnProperty"]) {
+      expect(decodeConfig(hashOf({ cc }))!.config.country).toBe("FR");
+    }
+  });
+
   it("refuses a week with no workday", () => {
     const decoded = decodeConfig(hashOf({ wd: [0, 1, 2, 3, 4, 5, 6] }))!;
     expect(decoded.config.weekendDays).toEqual(DEFAULT_CONFIG.weekendDays);

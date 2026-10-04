@@ -30,6 +30,17 @@ interface AppState extends AppConfig {
   resetConfig: () => void;
 }
 
+function withoutDate(state: AppConfig, dateKey: string) {
+  return {
+    blackoutDates: state.blackoutDates.filter((d) => d !== dateKey),
+    preBookedDates: state.preBookedDates.filter((d) => d !== dateKey),
+    preBookedTypes: Object.fromEntries(
+      Object.entries(state.preBookedTypes).filter(([k]) => k !== dateKey),
+    ),
+    customHolidays: state.customHolidays.filter((d) => d !== dateKey),
+  };
+}
+
 export const useAppStore = create<AppState>()((set) => ({
   ...DEFAULT_CONFIG,
 
@@ -61,11 +72,12 @@ export const useAppStore = create<AppState>()((set) => ({
 
   setStrategy: (strategy) => set({ strategy }),
 
+  // A date is in at most one of blackout, pre-booked or custom holiday:
+  // adding it to one list removes it from the others.
   addBlackoutDate: (dateKey) =>
     set((state) => ({
-      blackoutDates: state.blackoutDates.includes(dateKey)
-        ? state.blackoutDates
-        : [...state.blackoutDates, dateKey],
+      ...withoutDate(state, dateKey),
+      blackoutDates: [...withoutDate(state, dateKey).blackoutDates, dateKey],
     })),
 
   removeBlackoutDate: (dateKey) =>
@@ -74,12 +86,14 @@ export const useAppStore = create<AppState>()((set) => ({
     })),
 
   addPreBookedDate: (dateKey, leaveType) =>
-    set((state) => ({
-      preBookedDates: state.preBookedDates.includes(dateKey)
-        ? state.preBookedDates
-        : [...state.preBookedDates, dateKey],
-      preBookedTypes: { ...state.preBookedTypes, [dateKey]: leaveType },
-    })),
+    set((state) => {
+      const rest = withoutDate(state, dateKey);
+      return {
+        ...rest,
+        preBookedDates: [...rest.preBookedDates, dateKey],
+        preBookedTypes: { ...rest.preBookedTypes, [dateKey]: leaveType },
+      };
+    }),
 
   removePreBookedDate: (dateKey) =>
     set((state) => ({
@@ -91,9 +105,8 @@ export const useAppStore = create<AppState>()((set) => ({
 
   addCustomHoliday: (dateKey) =>
     set((state) => ({
-      customHolidays: state.customHolidays.includes(dateKey)
-        ? state.customHolidays
-        : [...state.customHolidays, dateKey],
+      ...withoutDate(state, dateKey),
+      customHolidays: [...withoutDate(state, dateKey).customHolidays, dateKey],
     })),
 
   removeCustomHoliday: (dateKey) =>

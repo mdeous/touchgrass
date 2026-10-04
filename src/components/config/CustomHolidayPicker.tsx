@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/popover";
 import { useAppStore } from "@/store/app-store";
 import { useDateLocale } from "@/hooks/use-date-locale";
+import { isInYear, yearPickerProps } from "@/components/config/year-scope";
 
 const DATE_FORMAT = "yyyy-MM-dd";
 
@@ -30,7 +31,10 @@ export function CustomHolidayPicker() {
   const addCustomHoliday = useAppStore((s) => s.addCustomHoliday);
   const removeCustomHoliday = useAppStore((s) => s.removeCustomHoliday);
 
-  const selectedDates = customHolidays.map(fromDateKey);
+  const year = useAppStore((s) => s.year);
+  // Only the selected year matters to the plan; other years stay stored.
+  const yearDates = customHolidays.filter((key) => isInYear(key, year));
+  const selectedDates = yearDates.map(fromDateKey);
 
   return (
     <div className="flex flex-col gap-2">
@@ -49,11 +53,12 @@ export function CustomHolidayPicker() {
             <Calendar
               mode="multiple"
               locale={locale}
+              {...yearPickerProps(year)}
               selected={selectedDates}
               onSelect={(dates) => {
                 if (!dates) return;
                 const newKeys = new Set(dates.map(toDateKey));
-                const oldKeys = new Set(customHolidays);
+                const oldKeys = new Set(yearDates);
                 for (const key of newKeys) {
                   if (!oldKeys.has(key)) addCustomHoliday(key);
                 }
@@ -70,9 +75,9 @@ export function CustomHolidayPicker() {
         {t("config.customHolidaysHelper")}
       </p>
 
-      {customHolidays.length > 0 && (
+      {yearDates.length > 0 && (
         <div className="flex flex-wrap gap-1">
-          {[...customHolidays].sort().map((dateKey) => (
+          {[...yearDates].sort().map((dateKey) => (
             <Badge key={dateKey} variant="secondary" className="gap-1 pr-1">
               {formatShortDate(fromDateKey(dateKey), locale, i18n.language)}
               <button

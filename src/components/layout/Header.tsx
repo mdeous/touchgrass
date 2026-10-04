@@ -13,11 +13,14 @@ import { useTheme } from "@/hooks/use-theme";
 import { LanguagePicker } from "@/components/layout/LanguagePicker";
 
 const currentYear = new Date().getFullYear();
-const YEARS = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+// Past years are not offered: every day in them is already over.
+const YEARS = Array.from({ length: 3 }, (_, i) => currentYear + i);
 
 export function Header() {
   const { t } = useTranslation();
   const year = useAppStore((s) => s.year);
+  // A shared link may point at another year; keep it selectable.
+  const years = YEARS.includes(year) ? YEARS : [...YEARS, year].sort();
   const setYear = useAppStore((s) => s.setYear);
   const { theme, toggleTheme } = useTheme();
 
@@ -38,7 +41,7 @@ export function Header() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {YEARS.map((y) => (
+              {years.map((y) => (
                 <SelectItem key={y} value={String(y)}>
                   {y}
                 </SelectItem>

@@ -22,6 +22,8 @@ export function WeekendSelector() {
     const next = weekendDays.includes(day)
       ? weekendDays.filter((d) => d !== day)
       : [...weekendDays, day];
+    // At least one day of the week must stay a workday.
+    if (next.length >= 7) return;
     setWeekendDays(next);
   };
 

@@ -23,9 +23,13 @@ export function PtoBudgetInputs() {
           type="number"
           min={0}
           max={50}
+          step={1}
           value={ptoBudget}
           onChange={(e) => {
-            const val = Math.max(0, Math.min(50, Number(e.target.value) || 0));
+            const val = Math.max(
+              0,
+              Math.min(50, Math.round(Number(e.target.value)) || 0),
+            );
             setPtoBudget(val);
           }}
         />
@@ -42,11 +46,12 @@ export function PtoBudgetInputs() {
             type="number"
             min={0}
             max={50}
+            step={1}
             value={recoveryBudget}
             onChange={(e) => {
               const val = Math.max(
                 0,
-                Math.min(50, Number(e.target.value) || 0),
+                Math.min(50, Math.round(Number(e.target.value)) || 0),
               );
               setRecoveryBudget(val);
             }}

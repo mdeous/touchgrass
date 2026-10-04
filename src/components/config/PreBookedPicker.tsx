@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/select";
 import { useAppStore } from "@/store/app-store";
 import { useDateLocale } from "@/hooks/use-date-locale";
+import { getCountryMeta } from "@/data/country-meta";
+import { isInYear, yearPickerProps } from "@/components/config/year-scope";
 
 const DATE_FORMAT = "yyyy-MM-dd";
 
@@ -39,9 +41,16 @@ export function PreBookedPicker() {
   const preBookedTypes = useAppStore((s) => s.preBookedTypes);
   const addPreBookedDate = useAppStore((s) => s.addPreBookedDate);
   const removePreBookedDate = useAppStore((s) => s.removePreBookedDate);
-  const [leaveType, setLeaveType] = useState<LeaveType>("pto");
+  const hasRecoveryDays = useAppStore(
+    (s) => getCountryMeta(s.country).hasRecoveryDays,
+  );
+  const [selectedType, setLeaveType] = useState<LeaveType>("pto");
+  const leaveType = hasRecoveryDays ? selectedType : "pto";
 
-  const selectedDates = preBookedDates.map(fromDateKey);
+  const year = useAppStore((s) => s.year);
+  // Only the selected year matters to the plan; other years stay stored.
+  const yearDates = preBookedDates.filter((key) => isInYear(key, year));
+  const selectedDates = yearDates.map(fromDateKey);
 
   return (
     <div className="flex flex-col gap-2">
@@ -55,31 +64,34 @@ export function PreBookedPicker() {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <div className="flex items-center gap-2 border-b px-3 py-2">
-              <span className="text-xs text-muted-foreground">
-                {t("config.type")}
-              </span>
-              <Select
-                value={leaveType}
-                onValueChange={(v) => setLeaveType(v as LeaveType)}
-              >
-                <SelectTrigger size="sm" className="h-7 w-20">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pto">{t("config.pto")}</SelectItem>
-                  <SelectItem value="recovery">{t("config.rtt")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {hasRecoveryDays && (
+              <div className="flex items-center gap-2 border-b px-3 py-2">
+                <span className="text-xs text-muted-foreground">
+                  {t("config.type")}
+                </span>
+                <Select
+                  value={leaveType}
+                  onValueChange={(v) => setLeaveType(v as LeaveType)}
+                >
+                  <SelectTrigger size="sm" className="h-7 w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pto">{t("config.pto")}</SelectItem>
+                    <SelectItem value="recovery">{t("config.rtt")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <Calendar
               mode="multiple"
               locale={locale}
+              {...yearPickerProps(year)}
               selected={selectedDates}
               onSelect={(dates) => {
                 if (!dates) return;
                 const newKeys = new Set(dates.map(toDateKey));
-                const oldKeys = new Set(preBookedDates);
+                const oldKeys = new Set(yearDates);
                 for (const key of newKeys) {
                   if (!oldKeys.has(key)) addPreBookedDate(key, leaveType);
                 }
@@ -96,9 +108,9 @@ export function PreBookedPicker() {
         {t("config.preBookedHelper")}
       </p>
 
-      {preBookedDates.length > 0 && (
+      {yearDates.length > 0 && (
         <div className="flex flex-wrap gap-1">
-          {[...preBookedDates].sort().map((dateKey) => (
+          {[...yearDates].sort().map((dateKey) => (
             <Badge key={dateKey} variant="outline" className="gap-1 pr-1">
               {formatShortDate(fromDateKey(dateKey), locale, i18n.language)}
               <span className="text-xs font-semibold uppercase text-primary">

@@ -23,7 +23,9 @@ interface AppState extends AppConfig {
   removePreBookedDate: (dateKey: string) => void;
   addCustomHoliday: (dateKey: string) => void;
   removeCustomHoliday: (dateKey: string) => void;
-  toggleManualOverride: (dateKey: string, leaveType: LeaveType | null) => void;
+  /** Force a day to a leave type, or to a workday with `null`. */
+  setManualOverride: (dateKey: string, leaveType: LeaveType | null) => void;
+  clearManualOverride: (dateKey: string) => void;
   toggleBridgeDisabled: (bridgeId: string) => void;
   resetConfig: () => void;
 }
@@ -99,21 +101,17 @@ export const useAppStore = create<AppState>()((set) => ({
       customHolidays: state.customHolidays.filter((d) => d !== dateKey),
     })),
 
-  toggleManualOverride: (dateKey, leaveType) =>
-    set((state) => {
-      if (leaveType === null) {
-        return {
-          manualOverrides: Object.fromEntries(
-            Object.entries(state.manualOverrides).filter(
-              ([k]) => k !== dateKey,
-            ),
-          ),
-        };
-      }
-      return {
-        manualOverrides: { ...state.manualOverrides, [dateKey]: leaveType },
-      };
-    }),
+  setManualOverride: (dateKey, leaveType) =>
+    set((state) => ({
+      manualOverrides: { ...state.manualOverrides, [dateKey]: leaveType },
+    })),
+
+  clearManualOverride: (dateKey) =>
+    set((state) => ({
+      manualOverrides: Object.fromEntries(
+        Object.entries(state.manualOverrides).filter(([k]) => k !== dateKey),
+      ),
+    })),
 
   toggleBridgeDisabled: (bridgeId) =>
     set((state) => ({
